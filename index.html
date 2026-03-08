@@ -493,7 +493,7 @@ const EMBEDDED = {"omzet":{"JAN":[{"d":1,"petrokimia":0.0,"perusahaan":2977500.0
 const S = {
   data: EMBEDDED,
   tab: 'omzet',
-  month: 'FEB',
+  month: 'MAR',
   mcuMonth: Object.keys(EMBEDDED.mcu || {})[Object.keys(EMBEDDED.mcu || {}).length - 1] || 'MAR',
   charts: {},
   live: false,
@@ -522,9 +522,17 @@ async function connectGS() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     if (json.error) throw new Error(json.error);
-    const mn = json.currentMonth || 'FEB';
+    const mn = json.currentMonth || 'MAR';
+    // Update bulan aktif dari Sheets
     if (json.omzetHarian?.length)      S.data.omzet[mn]     = json.omzetHarian;
     if (json.kunjunganHarian?.length)  S.data.kunjungan[mn] = json.kunjunganHarian;
+    // Kalau ada data bulan lain (allOmzet / allKunjungan), merge semuanya
+    if (json.allOmzet)      Object.assign(S.data.omzet,     json.allOmzet);
+    if (json.allKunjungan)  Object.assign(S.data.kunjungan, json.allKunjungan);
+    if (json.allMcu)        Object.assign(S.data.mcu,       json.allMcu);
+    // Selalu pindah ke bulan terbaru setelah data masuk
+    const latestOmzet = Object.keys(S.data.omzet);
+    if (latestOmzet.length) S.month = latestOmzet[latestOmzet.length - 1];
     S.live = true;
     document.getElementById('upd-lbl').textContent = 'LIVE · ' + new Date().toLocaleTimeString('id-ID');
     document.getElementById('src-lbl').textContent = 'REALTIME · GOOGLE SHEETS · 2026';
@@ -1247,18 +1255,32 @@ function buildTabs() {
   const el = document.getElementById('tabs');
   const omzetMs = Object.keys(S.data.omzet);
   const kunjMs  = Object.keys(S.data.kunjungan);
+  const mcuMs   = Object.keys(S.data.mcu || {});
+
+  // Dropdown bulan sesuai tab aktif
+  const activeMsList = S.tab === 'mcu' ? mcuMs : (S.tab === 'kunjungan' ? kunjMs : omzetMs);
+  const activeMonth  = S.tab === 'mcu' ? S.mcuMonth : S.month;
+  const onchangeFn   = S.tab === 'mcu'
+    ? `onchange="setMcuMonth(this.value)"`
+    : `onchange="setMonth('${S.tab}',this.value)"`;
+
+  const monthDropdown = activeMsList.length > 0 && S.tab !== 'laporan'
+    ? `<select class="month-select" ${onchangeFn} title="Pilih bulan">
+        ${activeMsList.map(m => `<option value="${m}" ${activeMonth===m?'selected':''}>${m}</option>`).join('')}
+       </select>`
+    : '';
+
   let h = '';
   h += `<button class="tab ${S.tab==='omzet'?'active':''}" onclick="setTab('omzet')">💰 Omzet</button>`;
-  omzetMs.forEach(m => h += `<button class="tab ${S.tab==='omzet'&&S.month===m?'active':''}" onclick="setMonth('omzet','${m}')">${m}</button>`);
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='kunjungan'?'active':''}" onclick="setTab('kunjungan')">👥 Kunjungan</button>`;
-  kunjMs.forEach(m => h += `<button class="tab ${S.tab==='kunjungan'&&S.month===m?'active':''}" onclick="setMonth('kunjungan','${m}')">${m}</button>`);
+  h += '<div class="tab-divider"></div>';
+  h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 Omzet MCU</button>`;
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='laporan'?'active':''}" onclick="setTab('laporan')">📋 Laporan Harian</button>`;
-  h += '<div class="tab-divider"></div>';
-  const mcuMs = Object.keys(S.data.mcu || {});
-  h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 Omzet MCU</button>`;
-  mcuMs.forEach(m => h += `<button class="tab ${S.tab==='mcu'&&S.mcuMonth===m?'active':''}" onclick="setMcuMonth('${m}')">${m}</button>`);
+  if (monthDropdown) {
+    h += `<div style="margin-left:auto;display:flex;align-items:center">${monthDropdown}</div>`;
+  }
   el.innerHTML = h;
 }
 
