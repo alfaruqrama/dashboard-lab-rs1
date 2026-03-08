@@ -1271,16 +1271,19 @@ function buildTabs() {
     : '';
 
   let h = '';
+  // Omzet + dropdown bulan langsung di sebelahnya
   h += `<button class="tab ${S.tab==='omzet'?'active':''}" onclick="setTab('omzet')">💰 Omzet</button>`;
+  if (S.tab === 'omzet' && monthDropdown) h += monthDropdown;
   h += '<div class="tab-divider"></div>';
+  // Kunjungan + dropdown bulan langsung di sebelahnya
   h += `<button class="tab ${S.tab==='kunjungan'?'active':''}" onclick="setTab('kunjungan')">👥 Kunjungan</button>`;
+  if (S.tab === 'kunjungan' && monthDropdown) h += monthDropdown;
   h += '<div class="tab-divider"></div>';
+  // MCU + dropdown bulan langsung di sebelahnya
   h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 Omzet MCU</button>`;
+  if (S.tab === 'mcu' && monthDropdown) h += monthDropdown;
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='laporan'?'active':''}" onclick="setTab('laporan')">📋 Laporan Harian</button>`;
-  if (monthDropdown) {
-    h += `<div style="margin-left:auto;display:flex;align-items:center">${monthDropdown}</div>`;
-  }
   el.innerHTML = h;
 }
 
