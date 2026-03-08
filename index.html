@@ -121,50 +121,27 @@ body::before {
   background: var(--white);
   border-bottom: 1px solid var(--bd);
   padding: 0 28px;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 2px;
+  overflow-x: auto; scrollbar-width: none;
   box-shadow: 0 1px 0 var(--bd);
   position: relative; z-index: 1;
-  height: 52px; flex-wrap: nowrap; overflow: hidden;
 }
 .tab {
-  padding: 7px 16px;
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: 8px;
+  padding: 14px 18px;
+  border: none; background: transparent;
   font-size: 12px; font-weight: 500;
   color: var(--mu); cursor: pointer;
+  border-bottom: 2px solid transparent;
   transition: all .18s; white-space: nowrap;
   font-family: 'DM Sans', sans-serif;
   letter-spacing: .01em;
-  display: flex; align-items: center; gap: 6px;
 }
-.tab:hover { color: var(--tx2); background: var(--bg); }
-.tab.active {
-  color: var(--ac); background: var(--ac-l);
-  border-color: rgba(10,158,135,.25); font-weight: 600;
-}
+.tab:hover { color: var(--tx2); }
+.tab.active { color: var(--ac); border-bottom-color: var(--ac); font-weight: 600; }
 .tab-divider {
-  width: 1px; height: 20px; background: var(--bd);
-  margin: 0 4px; flex-shrink: 0;
+  width: 1px; height: 18px; background: var(--bd);
+  margin: 0 6px; flex-shrink: 0; align-self: center;
 }
-/* Month selector dropdown */
-.month-select {
-  appearance: none; -webkit-appearance: none;
-  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8fa8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center;
-  border: 1px solid var(--bd);
-  border-radius: 8px;
-  padding: 6px 28px 6px 10px;
-  font-size: 12px; font-weight: 600;
-  color: var(--ac);
-  font-family: 'DM Mono', monospace;
-  cursor: pointer;
-  outline: none;
-  transition: all .18s;
-  min-width: 72px;
-}
-.month-select:hover { border-color: var(--ac); background-color: var(--ac-l); }
-.month-select:focus { border-color: var(--ac); box-shadow: 0 0 0 3px var(--ac-l); }
-.month-select option { color: var(--tx); background: var(--white); font-weight: 600; }
 
 /* ── MAIN ── */
 .main { padding: 24px 28px; position: relative; z-index: 1; }
@@ -498,11 +475,12 @@ tbody td:first-child { text-align: center; font-weight: 700; color: var(--ac); }
 
 <script>
 // ══════════════════════════════════════════════
-// ⚙️  KONFIGURASI — URL diambil otomatis dari server
-// GS_URL tidak perlu diisi di sini — aman dari GitHub
-// URL disimpan di Netlify Environment Variables
+// ⚙️  KONFIGURASI — CUKUP ISI SEKALI DI SINI
+// Paste URL Apps Script Anda di antara tanda kutip
+// Setelah diisi, upload ulang ke Netlify → semua device otomatis terhubung
 // ══════════════════════════════════════════════
-let GS_URL = '';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbw3obd6r4nhhXJDNu-anTwnYeG8Bzy7DQR5oWf4kyqm-Fpgzxj1CJNNEEeI-8LPKf0saQ/exec';
+// Contoh: const GS_URL = 'https://script.google.com/macros/s/AKfy.../exec';
 
 // ══════════════════════════════════════════════
 // EMBEDDED DATA
@@ -523,20 +501,9 @@ const S = {
   kumulatifTgl: 0,
 };
 
-window.onload = async () => {
-  // Ambil GS_URL dari Netlify Function (aman, tidak terekspos di kode)
-  try {
-    const res = await fetch('/.netlify/functions/config');
-    if (res.ok) {
-      const json = await res.json();
-      if (json.gsUrl) GS_URL = json.gsUrl;
-    }
-  } catch(e) {
-    console.warn('Tidak bisa mengambil config:', e.message);
-  }
-
+window.onload = () => {
   if (GS_URL.trim()) {
-    connectGS();
+    connectGS(); // fetchKumulatif dipanggil otomatis di dalam connectGS
   } else {
     const notice = document.getElementById('setup-notice');
     if (notice) notice.style.display = 'flex';
@@ -1280,36 +1247,18 @@ function buildTabs() {
   const el = document.getElementById('tabs');
   const omzetMs = Object.keys(S.data.omzet);
   const kunjMs  = Object.keys(S.data.kunjungan);
-  const mcuMs   = Object.keys(S.data.mcu || {});
-
-  // Month selectors: only show when tab is active
-  const omzetSel = `<select class="month-select" onchange="setMonth('omzet',this.value)" title="Pilih bulan">
-    ${omzetMs.map(m=>`<option value="${m}" ${S.month===m&&S.tab==='omzet'?'selected':''}>${m}</option>`).join('')}
-  </select>`;
-
-  const kunjSel = `<select class="month-select" onchange="setMonth('kunjungan',this.value)" title="Pilih bulan">
-    ${kunjMs.map(m=>`<option value="${m}" ${S.month===m&&S.tab==='kunjungan'?'selected':''}>${m}</option>`).join('')}
-  </select>`;
-
-  const mcuSel = mcuMs.length ? `<select class="month-select" onchange="setMcuMonth(this.value)" title="Pilih bulan">
-    ${mcuMs.map(m=>`<option value="${m}" ${S.mcuMonth===m?'selected':''}>${m}</option>`).join('')}
-  </select>` : '';
-
   let h = '';
   h += `<button class="tab ${S.tab==='omzet'?'active':''}" onclick="setTab('omzet')">💰 Omzet</button>`;
-  if (S.tab==='omzet') h += omzetSel;
-
+  omzetMs.forEach(m => h += `<button class="tab ${S.tab==='omzet'&&S.month===m?'active':''}" onclick="setMonth('omzet','${m}')">${m}</button>`);
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='kunjungan'?'active':''}" onclick="setTab('kunjungan')">👥 Kunjungan</button>`;
-  if (S.tab==='kunjungan') h += kunjSel;
-
+  kunjMs.forEach(m => h += `<button class="tab ${S.tab==='kunjungan'&&S.month===m?'active':''}" onclick="setMonth('kunjungan','${m}')">${m}</button>`);
   h += '<div class="tab-divider"></div>';
-  h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 MCU</button>`;
-  if (S.tab==='mcu') h += mcuSel;
-
+  h += `<button class="tab ${S.tab==='laporan'?'active':''}" onclick="setTab('laporan')">📋 Laporan Harian</button>`;
   h += '<div class="tab-divider"></div>';
-  h += `<button class="tab ${S.tab==='laporan'?'active':''}" onclick="setTab('laporan')">📋 Laporan</button>`;
-
+  const mcuMs = Object.keys(S.data.mcu || {});
+  h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 Omzet MCU</button>`;
+  mcuMs.forEach(m => h += `<button class="tab ${S.tab==='mcu'&&S.mcuMonth===m?'active':''}" onclick="setMcuMonth('${m}')">${m}</button>`);
   el.innerHTML = h;
 }
 
