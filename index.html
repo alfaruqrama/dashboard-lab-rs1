@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Lab RS 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #f0f4f8;
+  --bg2:   #e6ecf3;
+  --white: #ffffff;
+  --s1:    #ffffff;
+  --s2:    #f7f9fc;
+  --bd:    #dde4ee;
+  --bd2:   #c8d3e2;
+  --ac:    #0a9e87;
+  --ac-l:  #e6f7f4;
+  --ac2:   #f04e37;
+  --ac2-l: #fdecea;
+  --ac3:   #f59e0b;
+  --ac3-l: #fef3c7;
+  --ac4:   #3b82f6;
+  --ac4-l: #eff6ff;
+  --ac5:   #8b5cf6;
+  --tx:    #1a2535;
+  --tx2:   #3d5068;
+  --mu:    #7a8fa8;
+  --shadow: 0 1px 3px rgba(26,37,53,.06), 0 4px 12px rgba(26,37,53,.06);
+  --shadow-md: 0 2px 8px rgba(26,37,53,.08), 0 8px 24px rgba(26,37,53,.08);
+  --r: 14px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--tx);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* subtle grid texture on background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(10,158,135,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(10,158,135,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--bd);
+  padding: 0 28px;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  box-shadow: 0 1px 0 var(--bd), 0 2px 16px rgba(26,37,53,.05);
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.brand-icon {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--ac), #06b6d4);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  box-shadow: 0 2px 8px rgba(10,158,135,.3);
+  flex-shrink: 0;
+}
+.brand-text { line-height: 1.2; }
+.brand-name {
+  font-family: 'Fraunces', serif;
+  font-size: 15px; font-weight: 700;
+  color: var(--tx);
+  letter-spacing: -.01em;
+}
+.brand-sub {
+  font-size: 10px; color: var(--mu);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .04em;
+}
+.topbar-right {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--ac-l); border: 1px solid rgba(10,158,135,.2);
+  padding: 5px 12px; border-radius: 100px;
+  font-size: 10px; font-family: 'DM Mono', monospace;
+  color: var(--ac); font-weight: 500;
+}
+.pill-dot {
+  width: 6px; height: 6px; background: var(--ac); border-radius: 50%;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+.tbtn {
+  background: var(--white); border: 1px solid var(--bd);
+  border-radius: 9px; padding: 7px 16px;
+  font-size: 12px; font-family: 'DM Sans', sans-serif;
+  font-weight: 500; color: var(--tx2); cursor: pointer;
+  transition: all .18s; box-shadow: var(--shadow);
+}
+.tbtn:hover { border-color: var(--ac); color: var(--ac); background: var(--ac-l); }
+.tbtn.primary {
+  background: var(--ac); color: #fff; border-color: var(--ac);
+  box-shadow: 0 2px 8px rgba(10,158,135,.35);
+}
+.tbtn.primary:hover { opacity: .88; }
+
+/* ── TABS ── */
+.tab-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--bd);
+  padding: 0 28px;
+  display: flex; align-items: center; gap: 6px;
+  box-shadow: 0 1px 0 var(--bd);
+  position: relative; z-index: 1;
+  height: 52px; flex-wrap: nowrap; overflow: hidden;
+}
+.tab {
+  padding: 7px 16px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 500;
+  color: var(--mu); cursor: pointer;
+  transition: all .18s; white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: .01em;
+  display: flex; align-items: center; gap: 6px;
+}
+.tab:hover { color: var(--tx2); background: var(--bg); }
+.tab.active {
+  color: var(--ac); background: var(--ac-l);
+  border-color: rgba(10,158,135,.25); font-weight: 600;
+}
+.tab-divider {
+  width: 1px; height: 20px; background: var(--bd);
+  margin: 0 4px; flex-shrink: 0;
+}
+/* Month selector dropdown */
+.month-select {
+  appearance: none; -webkit-appearance: none;
+  background: var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8fa8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 9px center;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  padding: 6px 28px 6px 10px;
+  font-size: 12px; font-weight: 600;
+  color: var(--ac);
+  font-family: 'DM Mono', monospace;
+  cursor: pointer;
+  outline: none;
+  transition: all .18s;
+  min-width: 72px;
+}
+.month-select:hover { border-color: var(--ac); background-color: var(--ac-l); }
+.month-select:focus { border-color: var(--ac); box-shadow: 0 0 0 3px var(--ac-l); }
+.month-select option { color: var(--tx); background: var(--white); font-weight: 600; }
+
+/* ── MAIN ── */
+.main { padding: 24px 28px; position: relative; z-index: 1; }
+
+/* ── KPI CARDS ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.kpi {
+  background: var(--white);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  position: relative; overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: var(--shadow);
+}
+.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.kpi::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--kc, var(--ac));
+  border-radius: var(--r) var(--r) 0 0;
+}
+.kpi-ico {
+  position: absolute; top: 14px; right: 14px;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: var(--kbg, var(--ac-l));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.kpi-lbl {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--mu);
+  font-family: 'DM Mono', monospace; margin-bottom: 8px;
+}
+.kpi-val {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(18px, 2vw, 26px); font-weight: 700;
+  color: var(--kc, var(--ac)); line-height: 1;
+  letter-spacing: -.02em;
+}
+.kpi-sub { font-size: 11px; color: var(--mu); margin-top: 5px; }
+
+/* ── SECTION CARDS ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.fw { grid-column: 1 / -1; }
+.card {
+  background: var(--white);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+}
+.card-head { margin-bottom: 16px; }
+.card-t { font-size: 14px; font-weight: 600; color: var(--tx); }
+.card-s { font-size: 11px; color: var(--mu); margin-top: 3px; }
+canvas { max-height: 270px; }
+
+/* ── PAYER GRID ── */
+.payer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.pc {
+  background: var(--white); border: 1px solid var(--bd);
+  border-radius: 12px; padding: 14px 16px;
+  transition: all .18s; box-shadow: var(--shadow);
+  position: relative; overflow: hidden;
+}
+.pc::before {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--pcc, var(--ac));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .25s;
+}
+.pc:hover::before { transform: scaleX(1); }
+.pc:hover { border-color: var(--pcc, var(--ac)); box-shadow: var(--shadow-md); }
+.pc-n { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--mu); font-family: 'DM Mono', monospace; margin-bottom: 6px; }
+.pc-v { font-size: 14px; font-weight: 700; color: var(--pcc, var(--ac)); font-family: 'Fraunces', serif; }
+.pc-p { font-size: 10px; color: var(--mu); margin-top: 3px; }
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x: auto; margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; font-family: 'DM Mono', monospace; }
+thead th {
+  background: var(--s2); padding: 10px 14px;
+  text-align: right; font-size: 9px; letter-spacing: .07em;
+  color: var(--mu); text-transform: uppercase; white-space: nowrap;
+  border-bottom: 1px solid var(--bd); font-weight: 600;
+}
+thead th:first-child { text-align: center; border-radius: 8px 0 0 0; }
+thead th:last-child { border-radius: 0 8px 0 0; }
+tbody tr { border-bottom: 1px solid var(--bd); transition: background .1s; }
+tbody tr:hover { background: var(--s2); }
+tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 9px 14px; text-align: right; white-space: nowrap; color: var(--tx2); }
+tbody td:first-child { text-align: center; font-weight: 700; color: var(--ac); }
+
+/* badges */
+.bg { display:inline-block; padding:2px 9px; border-radius:100px; font-size:9px; font-weight:700; background:rgba(10,158,135,.12); color:var(--ac); border:1px solid rgba(10,158,135,.2); }
+.br { display:inline-block; padding:2px 9px; border-radius:100px; font-size:9px; font-weight:700; background:var(--ac2-l); color:var(--ac2); border:1px solid rgba(240,78,55,.2); }
+.by { display:inline-block; padding:2px 9px; border-radius:100px; font-size:9px; font-weight:700; background:var(--ac3-l); color:var(--ac3); border:1px solid rgba(245,158,11,.2); }
+.bp { display:inline-block; padding:2px 9px; border-radius:100px; font-size:9px; font-weight:700; background:#f3f0ff; color:var(--ac5); border:1px solid rgba(139,92,246,.2); }
+
+/* ── KUNJUNGAN UNIT CARDS ── */
+.k-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 10px; margin-bottom: 16px; }
+.kc {
+  background: var(--white); border: 1px solid var(--bd);
+  border-radius: 12px; padding: 16px; text-align: center;
+  transition: all .18s; box-shadow: var(--shadow);
+}
+.kc:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.kc-ico { font-size: 22px; margin-bottom: 8px; }
+.kc-lbl { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--mu); font-family: 'DM Mono', monospace; margin-bottom: 6px; }
+.kc-val { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--kcc, var(--ac)); line-height: 1; }
+.kc-pct { font-size: 10px; color: var(--mu); margin-top: 4px; }
+
+/* ── CONNECT MODAL ── */
+#modal {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(26,37,53,.45);
+  backdrop-filter: blur(6px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+#modal.open { display: flex; }
+.modal-box {
+  background: var(--white); border: 1px solid var(--bd);
+  border-radius: 20px; padding: 36px; max-width: 520px; width: 100%;
+  box-shadow: 0 20px 60px rgba(26,37,53,.2);
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-box h2 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--tx); margin-bottom: 6px; }
+.modal-box h2 span { color: var(--ac); }
+.modal-box p { font-size: 12px; color: var(--mu); margin-bottom: 20px; line-height: 1.7; }
+.steps { background: var(--s2); border: 1px solid var(--bd); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.step { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; font-size: 12px; color: var(--tx2); line-height: 1.6; }
+.step:last-child { margin-bottom: 0; }
+.step-n { width: 20px; height: 20px; background: var(--ac); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.step b { color: var(--tx); }
+.modal-input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.modal-input {
+  flex: 1; background: var(--s2); border: 1px solid var(--bd);
+  border-radius: 9px; padding: 11px 14px; color: var(--tx);
+  font-family: 'DM Mono', monospace; font-size: 11px; outline: none;
+  transition: border-color .18s;
+}
+.modal-input:focus { border-color: var(--ac); box-shadow: 0 0 0 3px var(--ac-l); }
+.modal-err { color: var(--ac2); font-size: 11px; display: none; margin-bottom: 8px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .grid2 { grid-template-columns: 1fr; }
+  .fw { grid-column: 1; }
+  .topbar, .tab-bar, .main { padding-left: 16px; padding-right: 16px; }
+  .brand-name { font-size: 13px; }
+}
+
+/* ── ANIMATIONS ── */
+.fadein { animation: fadein .4s ease both; }
+@keyframes fadein { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+.kpi { animation: fadein .35s ease both; }
+.kpi:nth-child(1){animation-delay:.05s}
+.kpi:nth-child(2){animation-delay:.1s}
+.kpi:nth-child(3){animation-delay:.15s}
+.kpi:nth-child(4){animation-delay:.2s}
+.kpi:nth-child(5){animation-delay:.25s}
+
+/* ── FORM LAPORAN HARIAN ── */
+.form-wrap { max-width: 860px; margin: 0 auto; padding: 28px 28px 80px; }
+.form-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #0d9e84 100%);
+  border-radius: 18px; padding: 28px 28px 24px;
+  margin-bottom: 20px; color: #fff; position: relative; overflow: hidden;
+}
+.form-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='15' cy='15' r='1'/%3E%3C/g%3E%3C/svg%3E");
+}
+.form-hero h2 { font-family:'Fraunces',serif; font-size:20px; font-weight:700; margin-bottom:4px; position:relative; }
+.form-hero p  { font-size:12px; opacity:.75; position:relative; }
+.form-date-row { display:flex; gap:10px; align-items:center; margin-top:14px; position:relative; flex-wrap:wrap; }
+.form-date-input {
+  background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3);
+  border-radius:9px; padding:8px 14px; color:#fff; font-size:13px;
+  font-family:'DM Mono',monospace; outline:none;
+}
+.form-date-input:focus { background:rgba(255,255,255,.22); }
+.form-date-input option { color:#1e293b; background:#fff; }
+
+.target-bar {
+  background:linear-gradient(135deg,var(--ac-l),var(--blue-l));
+  border:1px solid rgba(13,158,132,.2); border-radius:12px;
+  padding:14px 18px; margin-bottom:14px;
+  display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;
+}
+.target-item { display:flex; flex-direction:column; gap:4px; flex:1; min-width:130px; }
+.target-item label { font-size:10px; color:var(--mu); font-family:'DM Mono',monospace; font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
+.target-val {
+  background:var(--white); border:1px solid var(--bd); border-radius:7px;
+  padding:7px 10px; font-size:12px; font-family:'DM Mono',monospace;
+  font-weight:700; color:var(--tx); text-align:right; outline:none; width:100%;
+  transition: border-color .18s;
+}
+.target-val:focus { border-color:var(--ac); }
+
+.form-section {
+  background:var(--white); border:1px solid var(--bd);
+  border-radius:14px; margin-bottom:12px; box-shadow:var(--sh); overflow:hidden;
+}
+.fsec-head {
+  display:flex; align-items:center; gap:10px;
+  padding:12px 18px; background:var(--bg); border-bottom:1px solid var(--bd);
+  cursor:pointer; user-select:none;
+}
+.fsec-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.fsec-title { font-size:13px; font-weight:700; flex:1; }
+.fsec-arr { color:var(--mu); font-size:11px; transition:.2s; }
+.fsec-head.closed .fsec-arr { transform:rotate(-90deg); }
+.fsec-body { padding:16px 18px; }
+.fsec-body.hidden { display:none; }
+
+.fgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.fgrid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.fcol { display:flex; flex-direction:column; gap:4px; }
+.fcol label { font-size:11px; font-weight:600; color:var(--tx2); font-family:'DM Mono',monospace; }
+.fcol label .sub { font-weight:400; color:var(--mu); }
+.finput {
+  background:var(--bg); border:1px solid var(--bd); border-radius:8px;
+  padding:9px 12px; font-size:15px; font-weight:700; color:var(--tx);
+  font-family:'DM Mono',monospace; outline:none; text-align:right; width:100%;
+  transition:border-color .18s, box-shadow .18s;
+}
+.finput:focus { border-color:var(--ac); background:var(--white); box-shadow:0 0 0 3px rgba(13,158,132,.12); }
+.finput.auto { background:linear-gradient(135deg,#e8f8f5,#eff6ff); border-color:rgba(13,158,132,.3); color:var(--ac-d); pointer-events:none; font-size:13px; }
+.finput.rp { font-size:12px; }
+.fhr { grid-column:1/-1; border:none; border-top:1px dashed var(--bd); margin:2px 0; }
+.ffull { grid-column:1/-1; }
+
+.preview-wrap { background:#1e293b; border-radius:16px; margin-top:20px; box-shadow:var(--sh2); overflow:hidden; }
+.preview-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px; background:#0f172a; border-bottom:1px solid rgba(255,255,255,.08);
+}
+.preview-head span { font-size:11px; color:#64748b; font-family:'DM Mono',monospace; }
+.preview-acts { display:flex; gap:8px; }
+.btn-copy, .btn-wa {
+  display:flex; align-items:center; gap:5px; padding:7px 14px; border-radius:7px;
+  border:none; font-size:12px; font-weight:600; cursor:pointer; transition:.18s;
+  font-family:'DM Sans',sans-serif;
+}
+.btn-copy { background:rgba(255,255,255,.08); color:#94a3b8; }
+.btn-copy:hover { background:rgba(255,255,255,.15); color:#fff; }
+.btn-wa { background:#25d366; color:#fff; }
+.btn-wa:hover { background:#1aa64b; }
+.btn-reset { background:rgba(239,68,68,.15); color:#f87171; }
+.btn-reset:hover { background:rgba(239,68,68,.25); }
+.preview-text {
+  padding:20px; font-family:'DM Mono',monospace; font-size:12px;
+  line-height:2; color:#e2e8f0; white-space:pre; overflow-x:auto;
+  max-height:560px; overflow-y:auto;
+}
+.toast {
+  position:fixed; bottom:28px; left:50%; transform:translateX(-50%);
+  background:var(--ac); color:#fff; padding:10px 26px; border-radius:100px;
+  font-size:13px; font-weight:600; z-index:9999;
+  opacity:0; transition:.3s; pointer-events:none; white-space:nowrap;
+  box-shadow:0 4px 20px rgba(13,158,132,.4);
+}
+.toast.show { opacity:1; }
+.promo-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.promo-num {
+  width:22px; height:22px; background:#f5f3ff; color:#8b5cf6;
+  border-radius:6px; font-size:11px; font-weight:700; font-family:'DM Mono',monospace;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.promo-name-input {
+  flex:1; background:var(--bg); border:1px solid var(--bd); border-radius:8px;
+  padding:8px 12px; font-size:13px; color:var(--tx); outline:none;
+  font-family:'DM Sans',sans-serif; transition:border-color .18s;
+}
+.promo-name-input:focus { border-color:#8b5cf6; background:var(--white); }
+.promo-del {
+  width:28px; height:28px; border-radius:7px; border:none;
+  background:#fef2f2; color:#ef4444; font-size:12px; font-weight:700;
+  cursor:pointer; flex-shrink:0; transition:.15s;
+  display:flex; align-items:center; justify-content:center;
+}
+.promo-del:hover { background:#ef4444; color:#fff; }
+.promo-add-btn {
+  margin-top:8px; width:100%; padding:9px; border-radius:9px;
+  border:2px dashed #8b5cf6; background:#f5f3ff;
+  color:#8b5cf6; font-size:13px; font-weight:600; cursor:pointer;
+  font-family:'DM Sans',sans-serif; transition:.18s;
+}
+.promo-add-btn:hover { background:#8b5cf6; color:#fff; }
+@media (max-width:600px) {
+  .fgrid,.fgrid3 { grid-template-columns:1fr; }
+  .form-wrap { padding:16px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOPBAR ── -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">🔬</div>
+    <div class="brand-text">
+      <div class="brand-name">Lab RS Dashboard</div>
+      <div class="brand-sub" id="src-lbl">DATA EXCEL · 2026</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="pill"><div class="pill-dot"></div><span id="upd-lbl">Data Lokal</span></div>
+    <button class="tbtn primary" onclick="refreshData()" id="refresh-btn">🔄 Refresh Data</button>
+  </div>
+</div>
+
+
+<!-- ── TABS ── -->
+<div class="tab-bar" id="tabs"></div>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="main" id="main"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// ⚙️  KONFIGURASI — URL diambil otomatis dari server
+// GS_URL tidak perlu diisi di sini — aman dari GitHub
+// URL disimpan di Netlify Environment Variables
+// ══════════════════════════════════════════════
+let GS_URL = '';
+
+// ══════════════════════════════════════════════
+// EMBEDDED DATA
+// ══════════════════════════════════════════════
+const EMBEDDED = {"omzet":{"JAN":[{"d":1,"petrokimia":0.0,"perusahaan":2977500.0,"bri":1975590.0,"asuransi":3806000.0,"prokMurni":0.0,"prokBpjs":4271500.0,"bpjsKes":8997594.0,"bpjsTK":0.0,"umum":5126000.0,"total":27154184.0,"target":33213834.0,"pct":82},{"d":2,"petrokimia":0.0,"perusahaan":13309700.0,"bri":3506895.0,"asuransi":5615000.0,"prokMurni":681000.0,"prokBpjs":2178500.0,"bpjsKes":21879340.0,"bpjsTK":790000.0,"umum":33534500.0,"total":81494935.0,"target":80266766.0,"pct":102},{"d":3,"petrokimia":0.0,"perusahaan":5202500.0,"bri":4219785.0,"asuransi":3595500.0,"prokMurni":285500.0,"prokBpjs":5251500.0,"bpjsKes":18716089.0,"bpjsTK":716000.0,"umum":8088500.0,"total":46075374.0,"target":46130325.0,"pct":100},{"d":4,"petrokimia":0.0,"perusahaan":2260500.0,"bri":2739015.0,"asuransi":1516500.0,"prokMurni":876500.0,"prokBpjs":4417500.0,"bpjsKes":8837487.0,"bpjsTK":636000.0,"umum":3336500.0,"total":24620002.0,"target":33213833.999999996,"pct":74},{"d":5,"petrokimia":0.0,"perusahaan":11560075.0,"bri":8690895.0,"asuransi":5812800.0,"prokMurni":566000.0,"prokBpjs":566000.0,"bpjsKes":22949147.0,"bpjsTK":343000.0,"umum":5513800.0,"total":56001717.0,"target":76760860.8,"pct":73},{"d":6,"petrokimia":0.0,"perusahaan":25803494.0,"bri":5445225.0,"asuransi":10340300.0,"prokMurni":1248000.0,"prokBpjs":1248000.0,"bpjsKes":19507565.0,"bpjsTK":70000.0,"umum":9393000.0,"total":73055584.0,"target":76760860.8,"pct":95},{"d":7,"petrokimia":0.0,"perusahaan":17258477.0,"bri":1539405.0,"asuransi":13639814.0,"prokMurni":2896000.0,"prokBpjs":5763000.0,"bpjsKes":20586159.0,"bpjsTK":756000.0,"umum":5934500.0,"total":68373355.0,"target":76760860.8,"pct":89},{"d":8,"petrokimia":5149500.0,"perusahaan":36868700.0,"bri":939195.0,"asuransi":7666800.0,"prokMurni":952000.0,"prokBpjs":8331597.0,"bpjsKes":29441423.0,"bpjsTK":1403000.0,"umum":6045000.0,"total":96797215.0,"target":76760860.8,"pct":126},{"d":9,"petrokimia":0.0,"perusahaan":12232002.0,"bri":1853685.0,"asuransi":2561500.0,"prokMurni":1338500.0,"prokBpjs":2850500.0,"bpjsKes":22341096.0,"bpjsTK":696000.0,"umum":11123200.0,"total":54996483.0,"target":76760860.8,"pct":72},{"d":10,"petrokimia":0.0,"perusahaan":18382478.0,"bri":2086560.0,"asuransi":14261650.0,"prokMurni":621000.0,"prokBpjs":5635048.0,"bpjsKes":25491988.0,"bpjsTK":1480000.0,"umum":5463500.0,"total":73422224.0,"target":46130325.0,"pct":159},{"d":11,"petrokimia":0.0,"perusahaan":1940500.0,"bri":1258335.0,"asuransi":3038000.0,"prokMurni":0.0,"prokBpjs":2941000.0,"bpjsKes":11752042.0,"bpjsTK":120000.0,"umum":2947000.0,"total":23996877.0,"target":33213834.0,"pct":72},{"d":12,"petrokimia":0.0,"perusahaan":21913660.0,"bri":4960035.0,"asuransi":6496600.0,"prokMurni":1083000.0,"prokBpjs":4857548.0,"bpjsKes":23366821.0,"bpjsTK":626000.0,"umum":13310172.0,"total":76613836.0,"target":76760860.8,"pct":100},{"d":13,"petrokimia":0.0,"perusahaan":9322894.0,"bri":5851845.0,"asuransi":3729700.0,"prokMurni":1656000.0,"prokBpjs":2728000.0,"bpjsKes":24523976.0,"bpjsTK":443000.0,"umum":95305650.0,"total":143561065.0,"target":76760860.8,"pct":187},{"d":14,"petrokimia":0.0,"perusahaan":13208683.0,"bri":9189765.0,"asuransi":8719100.0,"prokMurni":1314500.0,"prokBpjs":4403000.0,"bpjsKes":18244586.0,"bpjsTK":343000.0,"umum":15421700.0,"total":70844334.0,"target":76760860.8,"pct":92},{"d":15,"petrokimia":0.0,"perusahaan":4684500.0,"bri":4766445.0,"asuransi":7438300.0,"prokMurni":2994500.0,"prokBpjs":1197500.0,"bpjsKes":25970426.0,"bpjsTK":687000.0,"umum":12608000.0,"total":60346671.0,"target":76760860.8,"pct":79},{"d":16,"petrokimia":0.0,"perusahaan":2049500.0,"bri":1884060.0,"asuransi":1237700.0,"prokMurni":121000.0,"prokBpjs":2095000.0,"bpjsKes":12164019.0,"bpjsTK":343000.0,"umum":3067000.0,"total":22961279.0,"target":33213834.0,"pct":69},{"d":17,"petrokimia":0.0,"perusahaan":5954000.0,"bri":2153790.0,"asuransi":4756000.0,"prokMurni":589500.0,"prokBpjs":357500.0,"bpjsKes":25989993.0,"bpjsTK":343000.0,"umum":11076000.0,"total":51219783.0,"target":46130325.0,"pct":111},{"d":18,"petrokimia":0.0,"perusahaan":2513574.0,"bri":1479870.0,"asuransi":265000.0,"prokMurni":121000.0,"prokBpjs":5213500.0,"bpjsKes":12225915.0,"bpjsTK":0.0,"umum":6027400.0,"total":27846259.0,"target":33213834.0,"pct":84},{"d":19,"petrokimia":0.0,"perusahaan":3948500.0,"bri":3971835.0,"asuransi":14416500.0,"prokMurni":598000.0,"prokBpjs":4701500.0,"bpjsKes":26280812.0,"bpjsTK":0.0,"umum":6066950.0,"total":59984097.0,"target":76760860.8,"pct":78},{"d":20,"petrokimia":0.0,"perusahaan":79408471.0,"bri":6228900.0,"asuransi":5948950.0,"prokMurni":1866000.0,"prokBpjs":3713000.0,"bpjsKes":20660849.0,"bpjsTK":483000.0,"umum":9911900.0,"total":128221070.0,"target":76760860.8,"pct":167},{"d":21,"petrokimia":0.0,"perusahaan":58457175.0,"bri":3462345.0,"asuransi":9402322.0,"prokMurni":2338000.0,"prokBpjs":6080000.0,"bpjsKes":23354196.0,"bpjsTK":1179000.0,"umum":6961150.0,"total":111234188.0,"target":76760860.8,"pct":145},{"d":22,"petrokimia":0.0,"perusahaan":26894595.0,"bri":4341195.0,"asuransi":6295000.0,"prokMurni":2656500.0,"prokBpjs":1860500.0,"bpjsKes":22998704.0,"bpjsTK":1436000.0,"umum":1141650.0,"total":67624144.0,"target":76760860.8,"pct":88},{"d":23,"petrokimia":0.0,"perusahaan":16927704.0,"bri":1295190.0,"asuransi":10885500.0,"prokMurni":1184500.0,"prokBpjs":2415000.0,"bpjsKes":19902908.0,"bpjsTK":1029000.0,"umum":7350100.0,"total":60989902.0,"target":76760860.8,"pct":79},{"d":24,"petrokimia":0.0,"perusahaan":6627084.0,"bri":1769850.0,"asuransi":11029050.0,"prokMurni":0.0,"prokBpjs":803500.0,"bpjsKes":19799481.0,"bpjsTK":0.0,"umum":10783500.0,"total":50812465.0,"target":46130325.0,"pct":110},{"d":25,"petrokimia":0.0,"perusahaan":3230000.0,"bri":2969460.0,"asuransi":10211800.0,"prokMurni":97000.0,"prokBpjs":966000.0,"bpjsKes":9943929.0,"bpjsTK":0.0,"umum":1606500.0,"total":29024689.0,"target":33213834.0,"pct":87},{"d":26,"petrokimia":0.0,"perusahaan":45198100.0,"bri":7548795.0,"asuransi":4834300.0,"prokMurni":553000.0,"prokBpjs":5877500.0,"bpjsKes":23241912.0,"bpjsTK":0.0,"umum":13674700.0,"total":100928307.0,"target":76760860.8,"pct":131},{"d":27,"petrokimia":665500.0,"perusahaan":10273500.0,"bri":10815525.0,"asuransi":4997300.0,"prokMurni":243500.0,"prokBpjs":2393000.0,"bpjsKes":16168913.0,"bpjsTK":262000.0,"umum":7368100.0,"total":53187338.0,"target":76760860.8,"pct":69},{"d":28,"petrokimia":0.0,"perusahaan":75098375.0,"bri":8669430.0,"asuransi":2815500.0,"prokMurni":1110500.0,"prokBpjs":2733548.0,"bpjsKes":22424520.0,"bpjsTK":2255000.0,"umum":8675100.0,"total":123781973.0,"target":76760860.8,"pct":161},{"d":29,"petrokimia":0.0,"perusahaan":39842070.0,"bri":1891755.0,"asuransi":9841800.0,"prokMurni":122500.0,"prokBpjs":2815008.0,"bpjsKes":22133259.0,"bpjsTK":1276000.0,"umum":5228600.0,"total":83150992.0,"target":76760860.8,"pct":108},{"d":30,"petrokimia":0.0,"perusahaan":23620875.0,"bri":6173820.0,"asuransi":3240000.0,"prokMurni":1259000.0,"prokBpjs":1163500.0,"bpjsKes":17498228.0,"bpjsTK":1697500.0,"umum":9156000.0,"total":63808923.0,"target":76760860.8,"pct":83},{"d":31,"petrokimia":0.0,"perusahaan":15527650.0,"bri":2497635.0,"asuransi":5069150.0,"prokMurni":2010000.0,"prokBpjs":3375500.0,"bpjsKes":21250547.0,"bpjsTK":746000.0,"umum":10006450.0,"total":60482932.0,"target":46130325.0,"pct":131}],"FEB":[{"d":1,"petrokimia":0.0,"perusahaan":1504000.0,"bri":1911600.0,"asuransi":1989000.0,"prokMurni":121000.0,"prokBpjs":6586500.0,"bpjsKes":8169779.0,"bpjsTK":716000.0,"umum":3020500.0,"total":24316754.0,"target":33213833.999999996,"pct":73},{"d":2,"petrokimia":313600.0,"perusahaan":22323894.0,"bri":4135050.0,"asuransi":7012250.0,"prokMurni":1241500.0,"prokBpjs":2906500.0,"bpjsKes":26804789.0,"bpjsTK":453000.0,"umum":7138450.0,"total":72501060.0,"target":71695222.4,"pct":101},{"d":3,"petrokimia":0.0,"perusahaan":42334239.0,"bri":8388675.0,"asuransi":10288600.0,"prokMurni":1651000.0,"prokBpjs":1767500.0,"bpjsKes":18833860.0,"bpjsTK":463000.0,"umum":28154000.0,"total":112464015.0,"target":71695222.4,"pct":157},{"d":4,"petrokimia":2700000.0,"perusahaan":25626797.0,"bri":5133375.0,"asuransi":6154150.0,"prokMurni":311000.0,"prokBpjs":2484500.0,"bpjsKes":14447028.0,"bpjsTK":1676000.0,"umum":11538700.0,"total":74137057.0,"target":71695222.4,"pct":103},{"d":5,"petrokimia":0.0,"perusahaan":40652467.0,"bri":6454890.0,"asuransi":12607400.0,"prokMurni":748000.0,"prokBpjs":6628500.0,"bpjsKes":25699241.0,"bpjsTK":706000.0,"umum":17351000.0,"total":110653599.0,"target":71695222.4,"pct":154},{"d":6,"petrokimia":0.0,"perusahaan":37920925.0,"bri":6704325.0,"asuransi":5708950.0,"prokMurni":183000.0,"prokBpjs":3899000.0,"bpjsKes":18209481.0,"bpjsTK":373000.0,"umum":11061050.0,"total":86926547.0,"target":71695222.4,"pct":121},{"d":7,"petrokimia":0.0,"perusahaan":34092117.0,"bri":6314850.0,"asuransi":13105800.0,"prokMurni":1146000.0,"prokBpjs":3469233.0,"bpjsKes":21440509.0,"bpjsTK":100000.0,"umum":9335000.0,"total":89807856.0,"target":46130325.0,"pct":195},{"d":8,"petrokimia":0.0,"perusahaan":521000.0,"bri":2905470.0,"asuransi":9934450.0,"prokMurni":0.0,"prokBpjs":2061500.0,"bpjsKes":6852849.0,"bpjsTK":526000.0,"umum":3448500.0,"total":26315919.0,"target":33213833.999999996,"pct":79},{"d":9,"petrokimia":0.0,"perusahaan":47012185.0,"bri":2918835.0,"asuransi":24730400.0,"prokMurni":0.0,"prokBpjs":7800094.0,"bpjsKes":20148958.0,"bpjsTK":338000.0,"umum":8280750.0,"total":124796750.0,"target":71695222.4,"pct":174},{"d":10,"petrokimia":395000.0,"perusahaan":35526725.0,"bri":6036930.0,"asuransi":10765800.0,"prokMurni":1424500.0,"prokBpjs":4418000.0,"bpjsKes":31490162.0,"bpjsTK":873000.0,"umum":5299500.0,"total":96193574.0,"target":71695222.4,"pct":134},{"d":11,"petrokimia":4225000.0,"perusahaan":10119043.0,"bri":6219990.0,"asuransi":802350.0,"prokMurni":1512000.0,"prokBpjs":796500.0,"bpjsKes":20868172.0,"bpjsTK":1372000.0,"umum":5911959.0,"total":45915055.0,"target":71695222.4,"pct":64},{"d":12,"petrokimia":0.0,"perusahaan":27647000.0,"bri":3446235.0,"asuransi":14761500.0,"prokMurni":713000.0,"prokBpjs":4858548.0,"bpjsKes":29971707.0,"bpjsTK":343000.0,"umum":5328213.0,"total":87069203.0,"target":71695222.4,"pct":121},{"d":13,"petrokimia":0.0,"perusahaan":45143550.0,"bri":1666170.0,"asuransi":15478400.0,"prokMurni":835500.0,"prokBpjs":3195634.0,"bpjsKes":23918858.0,"bpjsTK":979000.0,"umum":5601000.0,"total":96818112.0,"target":71695222.4,"pct":135},{"d":14,"petrokimia":0.0,"perusahaan":9852207.0,"bri":5097825.0,"asuransi":11430150.0,"prokMurni":1086000.0,"prokBpjs":2107000.0,"bpjsKes":15656020.0,"bpjsTK":2650000.0,"umum":7218500.0,"total":55097702.0,"target":46130325.0,"pct":119},{"d":15,"petrokimia":0.0,"perusahaan":3526500.0,"bri":1004400.0,"asuransi":2773500.0,"prokMurni":341500.0,"prokBpjs":2343500.0,"bpjsKes":11737404.0,"bpjsTK":763000.0,"umum":5518500.0,"total":28008304.0,"target":33213833.999999996,"pct":84},{"d":16,"petrokimia":0.0,"perusahaan":7779476.0,"bri":5439555.0,"asuransi":12994950.0,"prokMurni":3187000.0,"prokBpjs":1328469.0,"bpjsKes":19238535.0,"bpjsTK":343000.0,"umum":1027900.0,"total":51338885.0,"target":46130325.0,"pct":111},{"d":17,"petrokimia":0.0,"perusahaan":2009000.0,"bri":3081240.0,"asuransi":2922650.0,"prokMurni":0.0,"prokBpjs":3547000.0,"bpjsKes":7357149.0,"bpjsTK":0.0,"umum":2771500.0,"total":21688539.0,"target":33213833.999999996,"pct":65},{"d":18,"petrokimia":124000.0,"perusahaan":12569294.0,"bri":11106405.0,"asuransi":7479350.0,"prokMurni":1400000.0,"prokBpjs":755000.0,"bpjsKes":28736097.0,"bpjsTK":343000.0,"umum":3688500.0,"total":66201646.0,"target":71695222.4,"pct":92},{"d":19,"petrokimia":0.0,"perusahaan":16967745.0,"bri":5938695.0,"asuransi":8739350.0,"prokMurni":1926000.0,"prokBpjs":4325000.0,"bpjsKes":29467888.0,"bpjsTK":597000.0,"umum":4007100.0,"total":71968778.0,"target":71695222.4,"pct":100},{"d":20,"petrokimia":0.0,"perusahaan":17464851.0,"bri":8104860.0,"asuransi":15489400.0,"prokMurni":460000.0,"prokBpjs":2537000.0,"bpjsKes":24927511.0,"bpjsTK":2888500.0,"umum":6754500.0,"total":78626622.0,"target":71695222.4,"pct":110},{"d":21,"petrokimia":0.0,"perusahaan":8988809.0,"bri":9095580.0,"asuransi":16574000.0,"prokMurni":708500.0,"prokBpjs":2018000.0,"bpjsKes":23671343.0,"bpjsTK":1617000.0,"umum":2703000.0,"total":65376232.0,"target":46130325.0,"pct":142},{"d":22,"petrokimia":0.0,"perusahaan":780000.0,"bri":3849525.0,"asuransi":4502500.0,"prokMurni":377500.0,"prokBpjs":4309500.0,"bpjsKes":13546062.0,"bpjsTK":283000.0,"umum":3114500.0,"total":30762587.0,"target":33213833.999999996,"pct":93},{"d":23,"petrokimia":0.0,"perusahaan":29993100.0,"bri":8334090.0,"asuransi":8354800.0,"prokMurni":749000.0,"prokBpjs":1682000.0,"bpjsKes":24111972.0,"bpjsTK":756000.0,"umum":8047400.0,"total":82028362.0,"target":71695222.4,"pct":114},{"d":24,"petrokimia":0.0,"perusahaan":39946675.0,"bri":5143635.0,"asuransi":5791500.0,"prokMurni":1444500.0,"prokBpjs":2480500.0,"bpjsKes":26803851.0,"bpjsTK":866000.0,"umum":7883000.0,"total":90359661.0,"target":71695222.4,"pct":126},{"d":25,"petrokimia":0.0,"perusahaan":7798558.0,"bri":6242265.0,"asuransi":11344422.0,"prokMurni":723500.0,"prokBpjs":1771000.0,"bpjsKes":22147756.0,"bpjsTK":2996000.0,"umum":5478000.0,"total":58501501.0,"target":71695222.4,"pct":82},{"d":26,"petrokimia":0.0,"perusahaan":40677625.0,"bri":1399680.0,"asuransi":26539700.0,"prokMurni":1627500.0,"prokBpjs":3056000.0,"bpjsKes":20445889.0,"bpjsTK":1010000.0,"umum":3327550.0,"total":98083944.0,"target":71695222.4,"pct":137},{"d":27,"petrokimia":0.0,"perusahaan":52563050.0,"bri":1302480.0,"asuransi":14194300.0,"prokMurni":137500.0,"prokBpjs":986500.0,"bpjsKes":22175244.0,"bpjsTK":418000.0,"umum":5969000.0,"total":97746074.0,"target":71695222.4,"pct":136},{"d":28,"petrokimia":0.0,"perusahaan":16826700.0,"bri":7290630.0,"asuransi":3301500.0,"prokMurni":422000.0,"prokBpjs":2345500.0,"bpjsKes":21022074.0,"bpjsTK":1806000.0,"umum":7545500.0,"total":60559904.0,"target":46130325.0,"pct":131}],"MAR":[{"d":1,"petrokimia":0.0,"perusahaan":571000.0,"bri":86265.0,"asuransi":3431500.0,"prokMurni":40500.0,"prokBpjs":5196000.0,"bpjsKes":7166057.0,"bpjsTK":0.0,"umum":2985000.0,"total":19476322.0,"target":32850143.999999996,"pct":59},{"d":2,"petrokimia":0.0,"perusahaan":40213825.0,"bri":1013310.0,"asuransi":5324400.0,"prokMurni":755500.0,"prokBpjs":1503500.0,"bpjsKes":19586290.0,"bpjsTK":627000.0,"umum":5457000.0,"total":74480825.0,"target":75920332.8,"pct":98},{"d":3,"petrokimia":122500.0,"perusahaan":8024304.0,"bri":3526740.0,"asuransi":12777000.0,"prokMurni":648000.0,"prokBpjs":6344000.0,"bpjsKes":20604495.0,"bpjsTK":469000.0,"umum":12977850.0,"total":65493889.0,"target":75920332.8,"pct":86},{"d":4,"petrokimia":0.0,"perusahaan":39702105.0,"bri":3822705.0,"asuransi":8415700.0,"prokMurni":1185500.0,"prokBpjs":3381000.0,"bpjsKes":19795578.0,"bpjsTK":1815000.0,"umum":4319800.0,"total":82437388.0,"target":75920332.8,"pct":109},{"d":5,"petrokimia":0.0,"perusahaan":19773697.0,"bri":4999725.0,"asuransi":9992900.0,"prokMurni":40500.0,"prokBpjs":2582500.0,"bpjsKes":23203774.0,"bpjsTK":771000.0,"umum":14033350.0,"total":75397446.0,"target":75920332.8,"pct":99}]},"kunjungan":{"JAN":[{"d":1,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":1.0,"rj_asuransi":1.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":1.0,"rjTotal":4.0,"riTotal":51.0,"igdTotal":46.0,"mcuTotal":0.0,"total":101.0,"target":98.0,"pct":103},{"d":2,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":2.0,"rj_asuransi":1.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":96.0,"rj_bpjsTK":1.0,"rj_tunai":13.0,"rjTotal":116.0,"riTotal":56.0,"igdTotal":49.0,"mcuTotal":23.0,"total":244.0,"target":273.0,"pct":89},{"d":3,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":2.0,"rj_asuransi":3.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":112.0,"rj_bpjsTK":0.0,"rj_tunai":8.0,"rjTotal":128.0,"riTotal":62.0,"igdTotal":37.0,"mcuTotal":4.0,"total":231.0,"target":134.0,"pct":172},{"d":4,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":0.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":0.0,"rjTotal":0.0,"riTotal":55.0,"igdTotal":46.0,"mcuTotal":0.0,"total":101.0,"target":98.0,"pct":103},{"d":5,"rj_petrokimia":0.0,"rj_perusahaan":9.0,"rj_bri":5.0,"rj_asuransi":10.0,"rj_prokMurni":0.0,"rj_prokBpjs":1.0,"rj_bpjsKes":109.0,"rj_bpjsTK":0.0,"rj_tunai":9.0,"rjTotal":143.0,"riTotal":73.0,"igdTotal":56.0,"mcuTotal":11.0,"total":283.0,"target":273.0,"pct":104},{"d":6,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":6.0,"rj_asuransi":9.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":80.0,"rj_bpjsTK":1.0,"rj_tunai":15.0,"rjTotal":115.0,"riTotal":57.0,"igdTotal":49.0,"mcuTotal":88.0,"total":309.0,"target":273.0,"pct":113},{"d":7,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":2.0,"rj_asuransi":13.0,"rj_prokMurni":10.0,"rj_prokBpjs":0.0,"rj_bpjsKes":78.0,"rj_bpjsTK":2.0,"rj_tunai":6.0,"rjTotal":111.0,"riTotal":82.0,"igdTotal":46.0,"mcuTotal":116.0,"total":355.0,"target":273.0,"pct":130},{"d":8,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":1.0,"rj_asuransi":7.0,"rj_prokMurni":5.0,"rj_prokBpjs":0.0,"rj_bpjsKes":179.0,"rj_bpjsTK":1.0,"rj_tunai":4.0,"rjTotal":197.0,"riTotal":76.0,"igdTotal":39.0,"mcuTotal":146.0,"total":458.0,"target":273.0,"pct":168},{"d":9,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":0.0,"rj_asuransi":3.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":114.0,"rj_bpjsTK":1.0,"rj_tunai":9.0,"rjTotal":132.0,"riTotal":70.0,"igdTotal":40.0,"mcuTotal":22.0,"total":264.0,"target":273.0,"pct":97},{"d":10,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":0.0,"rj_asuransi":3.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":111.0,"rj_bpjsTK":1.0,"rj_tunai":4.0,"rjTotal":124.0,"riTotal":88.0,"igdTotal":46.0,"mcuTotal":23.0,"total":281.0,"target":134.0,"pct":210},{"d":11,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":0.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":4.0,"rjTotal":4.0,"riTotal":52.0,"igdTotal":42.0,"mcuTotal":0.0,"total":98.0,"target":98.0,"pct":100},{"d":12,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":2.0,"rj_asuransi":6.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":93.0,"rj_bpjsTK":1.0,"rj_tunai":12.0,"rjTotal":117.0,"riTotal":74.0,"igdTotal":48.0,"mcuTotal":23.0,"total":262.0,"target":273.0,"pct":96},{"d":13,"rj_petrokimia":0.0,"rj_perusahaan":5.0,"rj_bri":5.0,"rj_asuransi":7.0,"rj_prokMurni":9.0,"rj_prokBpjs":0.0,"rj_bpjsKes":126.0,"rj_bpjsTK":1.0,"rj_tunai":9.0,"rjTotal":162.0,"riTotal":71.0,"igdTotal":49.0,"mcuTotal":31.0,"total":313.0,"target":273.0,"pct":115},{"d":14,"rj_petrokimia":0.0,"rj_perusahaan":3.0,"rj_bri":6.0,"rj_asuransi":9.0,"rj_prokMurni":5.0,"rj_prokBpjs":0.0,"rj_bpjsKes":109.0,"rj_bpjsTK":1.0,"rj_tunai":8.0,"rjTotal":141.0,"riTotal":76.0,"igdTotal":45.0,"mcuTotal":7.0,"total":269.0,"target":273.0,"pct":99},{"d":15,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":3.0,"rj_asuransi":1.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":123.0,"rj_bpjsTK":0.0,"rj_tunai":7.0,"rjTotal":140.0,"riTotal":68.0,"igdTotal":33.0,"mcuTotal":30.0,"total":271.0,"target":273.0,"pct":99},{"d":16,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":1.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":1.0,"rj_bpjsTK":0.0,"rj_tunai":1.0,"rjTotal":3.0,"riTotal":58.0,"igdTotal":48.0,"mcuTotal":0.0,"total":109.0,"target":98.0,"pct":111},{"d":17,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":0.0,"rj_asuransi":8.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":167.0,"rj_bpjsTK":1.0,"rj_tunai":7.0,"rjTotal":185.0,"riTotal":64.0,"igdTotal":36.0,"mcuTotal":7.0,"total":292.0,"target":134.0,"pct":218},{"d":18,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":2.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":5.0,"rjTotal":7.0,"riTotal":63.0,"igdTotal":49.0,"mcuTotal":0.0,"total":119.0,"target":98.0,"pct":121},{"d":19,"rj_petrokimia":0.0,"rj_perusahaan":5.0,"rj_bri":2.0,"rj_asuransi":7.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":176.0,"rj_bpjsTK":0.0,"rj_tunai":8.0,"rjTotal":200.0,"riTotal":86.0,"igdTotal":28.0,"mcuTotal":8.0,"total":322.0,"target":273.0,"pct":118},{"d":20,"rj_petrokimia":0.0,"rj_perusahaan":6.0,"rj_bri":3.0,"rj_asuransi":3.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":105.0,"rj_bpjsTK":0.0,"rj_tunai":11.0,"rjTotal":132.0,"riTotal":58.0,"igdTotal":51.0,"mcuTotal":85.0,"total":326.0,"target":273.0,"pct":119},{"d":21,"rj_petrokimia":0.0,"rj_perusahaan":3.0,"rj_bri":1.0,"rj_asuransi":4.0,"rj_prokMurni":7.0,"rj_prokBpjs":0.0,"rj_bpjsKes":127.0,"rj_bpjsTK":0.0,"rj_tunai":12.0,"rjTotal":154.0,"riTotal":77.0,"igdTotal":30.0,"mcuTotal":151.0,"total":412.0,"target":273.0,"pct":151},{"d":22,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":2.0,"rj_asuransi":2.0,"rj_prokMurni":6.0,"rj_prokBpjs":0.0,"rj_bpjsKes":100.0,"rj_bpjsTK":0.0,"rj_tunai":9.0,"rjTotal":121.0,"riTotal":77.0,"igdTotal":52.0,"mcuTotal":76.0,"total":326.0,"target":273.0,"pct":119},{"d":23,"rj_petrokimia":0.0,"rj_perusahaan":4.0,"rj_bri":2.0,"rj_asuransi":5.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":91.0,"rj_bpjsTK":2.0,"rj_tunai":14.0,"rjTotal":120.0,"riTotal":68.0,"igdTotal":30.0,"mcuTotal":19.0,"total":237.0,"target":273.0,"pct":87},{"d":24,"rj_petrokimia":0.0,"rj_perusahaan":5.0,"rj_bri":0.0,"rj_asuransi":4.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":90.0,"rj_bpjsTK":1.0,"rj_tunai":10.0,"rjTotal":110.0,"riTotal":59.0,"igdTotal":38.0,"mcuTotal":8.0,"total":215.0,"target":134.0,"pct":160},{"d":25,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":0.0,"rj_asuransi":0.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":0.0,"rjTotal":3.0,"riTotal":77.0,"igdTotal":46.0,"mcuTotal":0.0,"total":126.0,"target":98.0,"pct":129},{"d":26,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":3.0,"rj_asuransi":10.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":90.0,"rj_bpjsTK":0.0,"rj_tunai":12.0,"rjTotal":118.0,"riTotal":85.0,"igdTotal":47.0,"mcuTotal":38.0,"total":288.0,"target":273.0,"pct":105},{"d":27,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":6.0,"rj_asuransi":6.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":71.0,"rj_bpjsTK":0.0,"rj_tunai":8.0,"rjTotal":93.0,"riTotal":74.0,"igdTotal":36.0,"mcuTotal":39.0,"total":242.0,"target":273.0,"pct":89},{"d":28,"rj_petrokimia":0.0,"rj_perusahaan":5.0,"rj_bri":1.0,"rj_asuransi":3.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":118.0,"rj_bpjsTK":2.0,"rj_tunai":14.0,"rjTotal":147.0,"riTotal":78.0,"igdTotal":47.0,"mcuTotal":98.0,"total":370.0,"target":273.0,"pct":136},{"d":29,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":2.0,"rj_asuransi":5.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":94.0,"rj_bpjsTK":2.0,"rj_tunai":6.0,"rjTotal":112.0,"riTotal":81.0,"igdTotal":36.0,"mcuTotal":62.0,"total":291.0,"target":273.0,"pct":107},{"d":30,"rj_petrokimia":0.0,"rj_perusahaan":7.0,"rj_bri":2.0,"rj_asuransi":3.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":79.0,"rj_bpjsTK":1.0,"rj_tunai":8.0,"rjTotal":104.0,"riTotal":67.0,"igdTotal":42.0,"mcuTotal":10.0,"total":223.0,"target":273.0,"pct":82},{"d":31,"rj_petrokimia":0.0,"rj_perusahaan":6.0,"rj_bri":3.0,"rj_asuransi":2.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":104.0,"rj_bpjsTK":0.0,"rj_tunai":6.0,"rjTotal":123.0,"riTotal":70.0,"igdTotal":38.0,"mcuTotal":7.0,"total":238.0,"target":134.0,"pct":178}],"FEB":[{"d":1,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":1.0,"rj_asuransi":1.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":0.0,"rjTotal":2.0,"riTotal":52.0,"igdTotal":46.0,"mcuTotal":0.0,"total":100.0,"target":108.594,"pct":92},{"d":2,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":3.0,"rj_asuransi":5.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":114.0,"rj_bpjsTK":0.0,"rj_tunai":7.0,"rjTotal":135.0,"riTotal":69.0,"igdTotal":48.0,"mcuTotal":17.0,"total":269.0,"target":280.0,"pct":96},{"d":3,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":6.0,"rj_asuransi":3.0,"rj_prokMurni":5.0,"rj_prokBpjs":0.0,"rj_bpjsKes":87.0,"rj_bpjsTK":0.0,"rj_tunai":5.0,"rjTotal":108.0,"riTotal":64.0,"igdTotal":34.0,"mcuTotal":26.0,"total":232.0,"target":280.0,"pct":83},{"d":4,"rj_petrokimia":0.0,"rj_perusahaan":4.0,"rj_bri":7.0,"rj_asuransi":6.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":110.0,"rj_bpjsTK":0.0,"rj_tunai":6.0,"rjTotal":134.0,"riTotal":78.0,"igdTotal":59.0,"mcuTotal":27.0,"total":298.0,"target":280.0,"pct":106},{"d":5,"rj_petrokimia":0.0,"rj_perusahaan":11.0,"rj_bri":5.0,"rj_asuransi":5.0,"rj_prokMurni":0.0,"rj_prokBpjs":1.0,"rj_bpjsKes":109.0,"rj_bpjsTK":0.0,"rj_tunai":11.0,"rjTotal":142.0,"riTotal":74.0,"igdTotal":53.0,"mcuTotal":11.0,"total":280.0,"target":280.0,"pct":100},{"d":6,"rj_petrokimia":1.0,"rj_perusahaan":4.0,"rj_bri":1.0,"rj_asuransi":3.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":85.0,"rj_bpjsTK":0.0,"rj_tunai":4.0,"rjTotal":98.0,"riTotal":94.0,"igdTotal":34.0,"mcuTotal":56.0,"total":282.0,"target":280.0,"pct":101},{"d":7,"rj_petrokimia":0.0,"rj_perusahaan":3.0,"rj_bri":0.0,"rj_asuransi":5.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":128.0,"rj_bpjsTK":0.0,"rj_tunai":7.0,"rjTotal":147.0,"riTotal":62.0,"igdTotal":29.0,"mcuTotal":13.0,"total":251.0,"target":150.82500000000002,"pct":166},{"d":8,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":1.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":1.0,"rjTotal":2.0,"riTotal":64.0,"igdTotal":28.0,"mcuTotal":0.0,"total":94.0,"target":108.594,"pct":87},{"d":9,"rj_petrokimia":0.0,"rj_perusahaan":3.0,"rj_bri":1.0,"rj_asuransi":8.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":128.0,"rj_bpjsTK":0.0,"rj_tunai":8.0,"rjTotal":149.0,"riTotal":57.0,"igdTotal":31.0,"mcuTotal":229.0,"total":466.0,"target":280.0,"pct":166},{"d":10,"rj_petrokimia":0.0,"rj_perusahaan":3.0,"rj_bri":7.0,"rj_asuransi":8.0,"rj_prokMurni":9.0,"rj_prokBpjs":0.0,"rj_bpjsKes":132.0,"rj_bpjsTK":0.0,"rj_tunai":8.0,"rjTotal":167.0,"riTotal":78.0,"igdTotal":50.0,"mcuTotal":137.0,"total":432.0,"target":280.0,"pct":154},{"d":11,"rj_petrokimia":1.0,"rj_perusahaan":5.0,"rj_bri":5.0,"rj_asuransi":4.0,"rj_prokMurni":6.0,"rj_prokBpjs":0.0,"rj_bpjsKes":91.0,"rj_bpjsTK":1.0,"rj_tunai":10.0,"rjTotal":123.0,"riTotal":73.0,"igdTotal":46.0,"mcuTotal":23.0,"total":265.0,"target":280.0,"pct":95},{"d":12,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":1.0,"rj_asuransi":2.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":174.0,"rj_bpjsTK":0.0,"rj_tunai":1.0,"rjTotal":182.0,"riTotal":79.0,"igdTotal":41.0,"mcuTotal":31.0,"total":333.0,"target":280.0,"pct":119},{"d":13,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":0.0,"rj_asuransi":8.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":128.0,"rj_bpjsTK":0.0,"rj_tunai":6.0,"rjTotal":145.0,"riTotal":66.0,"igdTotal":32.0,"mcuTotal":19.0,"total":262.0,"target":280.0,"pct":94},{"d":14,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":1.0,"rj_asuransi":7.0,"rj_prokMurni":3.0,"rj_prokBpjs":1.0,"rj_bpjsKes":108.0,"rj_bpjsTK":2.0,"rj_tunai":7.0,"rjTotal":129.0,"riTotal":60.0,"igdTotal":36.0,"mcuTotal":9.0,"total":234.0,"target":150.82500000000002,"pct":155},{"d":15,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":0.0,"rj_asuransi":1.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":0.0,"rjTotal":5.0,"riTotal":58.0,"igdTotal":52.0,"mcuTotal":0.0,"total":115.0,"target":108.594,"pct":106},{"d":16,"rj_petrokimia":0.0,"rj_perusahaan":5.0,"rj_bri":3.0,"rj_asuransi":1.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":70.0,"rj_bpjsTK":1.0,"rj_tunai":2.0,"rjTotal":86.0,"riTotal":68.0,"igdTotal":43.0,"mcuTotal":51.0,"total":248.0,"target":150.82500000000002,"pct":164},{"d":17,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":0.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":0.0,"rj_bpjsTK":0.0,"rj_tunai":1.0,"rjTotal":2.0,"riTotal":44.0,"igdTotal":42.0,"mcuTotal":0.0,"total":88.0,"target":108.594,"pct":81},{"d":18,"rj_petrokimia":0.0,"rj_perusahaan":10.0,"rj_bri":7.0,"rj_asuransi":7.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":199.0,"rj_bpjsTK":1.0,"rj_tunai":6.0,"rjTotal":232.0,"riTotal":81.0,"igdTotal":39.0,"mcuTotal":14.0,"total":366.0,"target":280.0,"pct":131},{"d":19,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":1.0,"rj_asuransi":1.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":162.0,"rj_bpjsTK":1.0,"rj_tunai":5.0,"rjTotal":174.0,"riTotal":77.0,"igdTotal":37.0,"mcuTotal":11.0,"total":299.0,"target":280.0,"pct":107},{"d":20,"rj_petrokimia":0.0,"rj_perusahaan":6.0,"rj_bri":2.0,"rj_asuransi":3.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":87.0,"rj_bpjsTK":0.0,"rj_tunai":3.0,"rjTotal":102.0,"riTotal":84.0,"igdTotal":49.0,"mcuTotal":27.0,"total":262.0,"target":280.0,"pct":94},{"d":21,"rj_petrokimia":0.0,"rj_perusahaan":8.0,"rj_bri":0.0,"rj_asuransi":1.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":92.0,"rj_bpjsTK":1.0,"rj_tunai":5.0,"rjTotal":109.0,"riTotal":75.0,"igdTotal":64.0,"mcuTotal":14.0,"total":262.0,"target":150.82500000000002,"pct":174},{"d":22,"rj_petrokimia":1.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":0.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":2.0,"rj_bpjsTK":0.0,"rj_tunai":1.0,"rjTotal":4.0,"riTotal":72.0,"igdTotal":46.0,"mcuTotal":0.0,"total":122.0,"target":108.594,"pct":112},{"d":23,"rj_petrokimia":0.0,"rj_perusahaan":4.0,"rj_bri":2.0,"rj_asuransi":7.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":114.0,"rj_bpjsTK":1.0,"rj_tunai":8.0,"rjTotal":139.0,"riTotal":80.0,"igdTotal":41.0,"mcuTotal":18.0,"total":278.0,"target":280.0,"pct":99},{"d":24,"rj_petrokimia":0.0,"rj_perusahaan":6.0,"rj_bri":4.0,"rj_asuransi":0.0,"rj_prokMurni":1.0,"rj_prokBpjs":0.0,"rj_bpjsKes":81.0,"rj_bpjsTK":0.0,"rj_tunai":7.0,"rjTotal":99.0,"riTotal":84.0,"igdTotal":50.0,"mcuTotal":26.0,"total":259.0,"target":280.0,"pct":92},{"d":25,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":3.0,"rj_asuransi":2.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":67.0,"rj_bpjsTK":0.0,"rj_tunai":7.0,"rjTotal":84.0,"riTotal":78.0,"igdTotal":46.0,"mcuTotal":8.0,"total":216.0,"target":280.0,"pct":77},{"d":26,"rj_petrokimia":0.0,"rj_perusahaan":3.0,"rj_bri":0.0,"rj_asuransi":4.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":87.0,"rj_bpjsTK":2.0,"rj_tunai":7.0,"rjTotal":106.0,"riTotal":70.0,"igdTotal":37.0,"mcuTotal":36.0,"total":249.0,"target":280.0,"pct":89},{"d":27,"rj_petrokimia":0.0,"rj_perusahaan":4.0,"rj_bri":2.0,"rj_asuransi":2.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":96.0,"rj_bpjsTK":0.0,"rj_tunai":7.0,"rjTotal":113.0,"riTotal":65.0,"igdTotal":36.0,"mcuTotal":28.0,"total":242.0,"target":280.0,"pct":86},{"d":28,"rj_petrokimia":0.0,"rj_perusahaan":2.0,"rj_bri":1.0,"rj_asuransi":1.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":100.0,"rj_bpjsTK":1.0,"rj_tunai":13.0,"rjTotal":121.0,"riTotal":56.0,"igdTotal":44.0,"mcuTotal":8.0,"total":229.0,"target":150.82500000000002,"pct":152}],"MAR":[{"d":1,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":0.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":1.0,"rj_bpjsTK":6.0,"rj_tunai":1.0,"rjTotal":10.0,"riTotal":52.0,"igdTotal":39.0,"mcuTotal":0.0,"total":101.0,"target":128.826,"pct":78},{"d":2,"rj_petrokimia":0.0,"rj_perusahaan":4.0,"rj_bri":1.0,"rj_asuransi":5.0,"rj_prokMurni":2.0,"rj_prokBpjs":0.0,"rj_bpjsKes":91.0,"rj_bpjsTK":0.0,"rj_tunai":6.0,"rjTotal":109.0,"riTotal":63.0,"igdTotal":49.0,"mcuTotal":16.0,"total":237.0,"target":297.7312,"pct":80},{"d":3,"rj_petrokimia":0.0,"rj_perusahaan":3.0,"rj_bri":2.0,"rj_asuransi":4.0,"rj_prokMurni":3.0,"rj_prokBpjs":0.0,"rj_bpjsKes":71.0,"rj_bpjsTK":0.0,"rj_tunai":8.0,"rjTotal":91.0,"riTotal":56.0,"igdTotal":55.0,"mcuTotal":14.0,"total":216.0,"target":297.7312,"pct":73},{"d":4,"rj_petrokimia":0.0,"rj_perusahaan":7.0,"rj_bri":3.0,"rj_asuransi":4.0,"rj_prokMurni":4.0,"rj_prokBpjs":0.0,"rj_bpjsKes":91.0,"rj_bpjsTK":3.0,"rj_tunai":5.0,"rjTotal":117.0,"riTotal":65.0,"igdTotal":35.0,"mcuTotal":71.0,"total":288.0,"target":297.7312,"pct":97},{"d":5,"rj_petrokimia":0.0,"rj_perusahaan":1.0,"rj_bri":5.0,"rj_asuransi":4.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":118.0,"rj_bpjsTK":0.0,"rj_tunai":4.0,"rjTotal":132.0,"riTotal":77.0,"igdTotal":40.0,"mcuTotal":29.0,"total":278.0,"target":297.7312,"pct":93},{"d":6,"rj_petrokimia":0.0,"rj_perusahaan":0.0,"rj_bri":0.0,"rj_asuransi":3.0,"rj_prokMurni":0.0,"rj_prokBpjs":0.0,"rj_bpjsKes":70.0,"rj_bpjsTK":0.0,"rj_tunai":5.0,"rjTotal":78.0,"riTotal":68.0,"igdTotal":36.0,"mcuTotal":15.0,"total":197.0,"target":297.7312,"pct":66}]},"mcu":{"JAN":[{"d":1,"omzet":0.0},{"d":2,"omzet":35491700.0},{"d":3,"omzet":3366500.0},{"d":4,"omzet":0.0},{"d":5,"omzet":6435600.0},{"d":6,"omzet":25059050.0},{"d":7,"omzet":20072579.0},{"d":8,"omzet":40390500.0},{"d":9,"omzet":12728722.0},{"d":10,"omzet":7892000.0},{"d":11,"omzet":0.0},{"d":12,"omzet":30654141.0},{"d":13,"omzet":96334202.0},{"d":14,"omzet":8305350.0},{"d":15,"omzet":13416600.0},{"d":16,"omzet":0.0},{"d":17,"omzet":7512000.0},{"d":18,"omzet":0.0},{"d":19,"omzet":7055400.0},{"d":20,"omzet":66999971.0},{"d":21,"omzet":67368997.0},{"d":22,"omzet":22335350.0},{"d":23,"omzet":9043852.0},{"d":24,"omzet":6996800.0},{"d":25,"omzet":0.0},{"d":26,"omzet":48114100.0},{"d":27,"omzet":8251300.0},{"d":28,"omzet":63407875.0},{"d":29,"omzet":48229425.0},{"d":30,"omzet":16726625.0},{"d":31,"omzet":15128900.0}],"FEB":[{"d":1,"omzet":0.0},{"d":2,"omzet":23699694.0},{"d":3,"omzet":68091450.0},{"d":4,"omzet":28376856.0},{"d":5,"omzet":6435600.0},{"d":6,"omzet":39270475.0},{"d":7,"omzet":32670625.0},{"d":8,"omzet":0.0},{"d":9,"omzet":66205925.0},{"d":10,"omzet":35537325.0},{"d":11,"omzet":4257050.0},{"d":12,"omzet":32700113.0},{"d":13,"omzet":51719650.0},{"d":14,"omzet":7889325.0},{"d":15,"omzet":0.0},{"d":16,"omzet":49472126.0},{"d":17,"omzet":0.0},{"d":18,"omzet":8870450.0},{"d":19,"omzet":20899601.0},{"d":20,"omzet":23476051.0},{"d":21,"omzet":11210225.0},{"d":22,"omzet":0.0},{"d":23,"omzet":4257050.0},{"d":24,"omzet":37109175.0},{"d":25,"omzet":8089722.0},{"d":26,"omzet":53516125.0},{"d":27,"omzet":59407350.0},{"d":28,"omzet":14640200.0},{"d":29,"omzet":0.0},{"d":30,"omzet":0.0},{"d":31,"omzet":0.0}],"MAR":[{"d":1,"omzet":0.0},{"d":2,"omzet":39375825.0},{"d":3,"omzet":11485025.0},{"d":4,"omzet":37878675.0},{"d":5,"omzet":29400255.0},{"d":6,"omzet":0.0},{"d":7,"omzet":0.0},{"d":8,"omzet":0.0},{"d":9,"omzet":0.0},{"d":10,"omzet":0.0},{"d":11,"omzet":0.0},{"d":12,"omzet":0.0},{"d":13,"omzet":0.0},{"d":14,"omzet":0.0},{"d":15,"omzet":0.0},{"d":16,"omzet":0.0},{"d":17,"omzet":0.0},{"d":18,"omzet":0.0},{"d":19,"omzet":0.0},{"d":20,"omzet":0.0},{"d":21,"omzet":0.0},{"d":22,"omzet":0.0},{"d":23,"omzet":0.0},{"d":24,"omzet":0.0},{"d":25,"omzet":0.0},{"d":26,"omzet":0.0},{"d":27,"omzet":0.0},{"d":28,"omzet":0.0},{"d":29,"omzet":0.0},{"d":30,"omzet":0.0},{"d":31,"omzet":0.0}]}};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const S = {
+  data: EMBEDDED,
+  tab: 'omzet',
+  month: 'FEB',
+  mcuMonth: Object.keys(EMBEDDED.mcu || {})[Object.keys(EMBEDDED.mcu || {}).length - 1] || 'MAR',
+  charts: {},
+  live: false,
+  kumulatifLoaded: false,
+  kumulatifTgl: 0,
+};
+
+window.onload = async () => {
+  // Ambil GS_URL dari Netlify Function (aman, tidak terekspos di kode)
+  try {
+    const res = await fetch('/.netlify/functions/config');
+    if (res.ok) {
+      const json = await res.json();
+      if (json.gsUrl) GS_URL = json.gsUrl;
+    }
+  } catch(e) {
+    console.warn('Tidak bisa mengambil config:', e.message);
+  }
+
+  if (GS_URL.trim()) {
+    connectGS();
+  } else {
+    const notice = document.getElementById('setup-notice');
+    if (notice) notice.style.display = 'flex';
+    render();
+  }
+};
+
+// ══════════════════════════════════════════════
+// GOOGLE SHEETS
+// ══════════════════════════════════════════════
+async function connectGS() {
+  const url = GS_URL.trim();
+  if (!url) return;
+  try {
+    const res  = await fetch(url + '?action=getSummary');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    const mn = json.currentMonth || 'FEB';
+    if (json.omzetHarian?.length)      S.data.omzet[mn]     = json.omzetHarian;
+    if (json.kunjunganHarian?.length)  S.data.kunjungan[mn] = json.kunjunganHarian;
+    S.live = true;
+    document.getElementById('upd-lbl').textContent = 'LIVE · ' + new Date().toLocaleTimeString('id-ID');
+    document.getElementById('src-lbl').textContent = 'REALTIME · GOOGLE SHEETS · 2026';
+    render();
+    // Juga fetch kumulatif untuk form laporan
+    fetchKumulatif(url);
+  } catch(e) {
+    console.warn('Sheets tidak terhubung:', e.message);
+    render();
+  }
+}
+
+async function fetchKumulatif(url) {
+  if (!url) url = GS_URL.trim();
+  if (!url) return;
+  try {
+    const res  = await fetch(url + '?action=getKumulatif');
+    if (!res.ok) return;
+    const json = await res.json();
+    if (json.error) { console.warn('Kumulatif error:', json.error); return; }
+    // Auto-isi form state
+    if (json.kumOmzet  > 0) F.kumul_omzet          = json.kumOmzet;
+    if (json.kumKunj   > 0) F.kumul_kunj            = json.kumKunj;
+    if (json.targetOmzetHarian > 0) F.target_omzet_harian = json.targetOmzetHarian;
+    if (json.targetKunjHarian  > 0) F.target_kunj_harian  = json.targetKunjHarian;
+    if (json.targetOmzetBulan  > 0) F.target_omzet_bulan  = json.targetOmzetBulan;
+    if (json.targetKunjBulan   > 0) F.target_kunj_bulan   = json.targetKunjBulan;
+    S.kumulatifLoaded = true;
+    S.kumulatifTgl    = json.tglAkhir || 0;
+    // Jika sedang di tab laporan, re-render
+    if (S.tab === 'laporan') renderLaporan();
+  } catch(e) {
+    console.warn('Kumulatif fetch error:', e.message);
+  }
+}
+async function refreshData() {
+  if (!GS_URL.trim()) return;
+  document.getElementById('upd-lbl').textContent = 'Memuat...';
+  document.getElementById('refresh-btn').textContent = '⏳';
+  await connectGS();
+  document.getElementById('refresh-btn').textContent = '🔄 Refresh Data';
+}
+
+// ══════════════════════════════════════════════
+// LAPORAN HARIAN
+// ══════════════════════════════════════════════
+
+// State form laporan — persist selama session
+const F = {
+  // Tanggal
+  tanggal: new Date().toISOString().slice(0,10),
+  hari: ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][new Date().getDay()],
+
+  // Kunjungan
+  rj: 0, rj_non_bpjs: 0,
+  ri: 0, ri_non_bpjs: 0,
+  igd: 0, igd_non_bpjs: 0,
+  mcu: 0,
+  rujukan_grahu: 0, rujukan_ppk1: 0, rujukan_satkal: 0, rujukan_luar: 0,
+  poli_exclusive: 0, poli_prioritas: 0,
+
+  // BRI Life
+  bri_igd_kry: 0, bri_igd_kel: 0,
+  bri_rajal_kry: 0, bri_rajal_kel: 0,
+  bri_rawin_kry: 0, bri_rawin_kel: 0,
+
+  // Promo Lab — array dinamis, bisa tambah/hapus
+  promoList: [
+    'paket Basic pekerja (umum)',
+    'Paket sahabat ginjal (umum)',
+    'Mini MCU',
+    'Pre marital silver',
+    'Promo alergi',
+    'Sehat Bugar',
+    'Paket Narkoba',
+    'Paket executive platinum',
+  ],
+  promoVals: [0,0,0,0,0,0,0,0],
+
+  // AS Morulla
+  morulla_jadwal: 0, morulla_hadir: 0,
+
+  // Pendapatan
+  pend_mcu: 0, pend_non_mcu: 0,
+
+  // Target (bisa diubah)
+  target_kunj_harian: 300,
+  target_omzet_harian: 75920333,
+  target_kunj_bulan: 7157,
+  target_omzet_bulan: 1825008000,
+
+  // Kumulatif — isi manual
+  kumul_omzet: 0, kumul_kunj: 0,
+  tgl_awal: 1, // "01-XX Maret"
+};
+
+// Hari dalam bahasa Indonesia
+const HARI_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN_ID = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+function fmtRp(n) {
+  if (!n || isNaN(n)) return '0';
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+function parseRp(s) {
+  return parseInt(String(s).replace(/[^0-9]/g,'')) || 0;
+}
+function pct(val, total) {
+  if (!total) return 0;
+  return Math.round(val / total * 100);
+}
+function getTglStr() {
+  const d = new Date(F.tanggal + 'T00:00:00');
+  const hari = HARI_ID[d.getDay()];
+  const tgl  = d.getDate();
+  const bln  = BULAN_ID[d.getMonth()];
+  const thn  = d.getFullYear();
+  return `${hari}, ${tgl < 10 ? '0'+tgl : tgl} ${bln} ${thn}`;
+}
+function getTglAkhir() {
+  // Kalau sudah dimuat dari Sheets, pakai tgl terakhir yang ada data
+  if (S.kumulatifLoaded && S.kumulatifTgl > 0) return S.kumulatifTgl;
+  // Fallback: pakai tanggal yang dipilih di form
+  const d = new Date(F.tanggal + 'T00:00:00');
+  return d.getDate();
+}
+function getBulanStr() {
+  const d = new Date(F.tanggal + 'T00:00:00');
+  return BULAN_ID[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function buildLaporan() {
+  const totalKunj = (F.rj||0) + (F.ri||0) + (F.igd||0) + (F.mcu||0);
+  const totalPend = (F.pend_mcu||0) + (F.pend_non_mcu||0);
+  const rataRata  = totalKunj > 0 ? Math.round(totalPend / totalKunj) : 0;
+  const pctKunj   = pct(totalKunj, F.target_kunj_harian);
+  const pctPend   = pct(totalPend, F.target_omzet_harian);
+  const pctKumulOmzet = pct(F.kumul_omzet, F.target_omzet_bulan);
+  const pctKumulKunj  = pct(F.kumul_kunj,  F.target_kunj_bulan);
+  const tglAkhir = getTglAkhir();
+  const bulanStr = getBulanStr();
+
+  return `LAPORAN KUNJUNGAN \n${getTglStr()}\n\n` +
+`* Rawat Jalan : ${F.rj||0}\n?Non BPJS : ${F.rj_non_bpjs||0}\n` +
+`* Rawat Inap : ${F.ri||0}\n?Non BPJS : ${F.ri_non_bpjs||0}\n` +
+`* IGD : ${F.igd||0}\n?Non BPJS : ${F.igd_non_bpjs||0}\n` +
+`* MCU : ${F.mcu||0}\n` +
+`* Rujukan SBU/Grahu : ${F.rujukan_grahu||0}\n` +
+`* Rujukan SBU/PPK1 : ${F.rujukan_ppk1||0}\n` +
+`* Rujukan SBU/Satkal : ${F.rujukan_satkal||0}\n` +
+`* Rujukan dokter Luar : ${F.rujukan_luar||0}\n` +
+`* Poli Exclusive : ${F.poli_exclusive||0}\n` +
+`* Poli Prioritas : ${F.poli_prioritas||0}\n` +
+`* Pasien BRI LIFE PG:\n` +
+`1. Igd BRI Life Kry PG : ${F.bri_igd_kry||0}\n` +
+`2. Igd BRI Life Kel PG : ${F.bri_igd_kel||0}\n` +
+`3. Rajal BRI Life Kry PG : ${F.bri_rajal_kry||0}\n` +
+`4. Rajal BRI Life Kel PG : ${F.bri_rajal_kel||0}\n` +
+`5. Rawin BRI Life Kry PG : ${F.bri_rawin_kry||0}\n` +
+`6. Rawin BRI Life Kel PG : ${F.bri_rawin_kel||0}\n\n` +
+`* Promo Lab : \n` +
+F.promoList.map((nama, i) => `${i+1}. ${nama}: ${F.promoVals[i]||0}`).join('\n') + '\n\n' +
+`* Pasien AS Morulla \n` +
+`1. Terjadwal hari ini : ${F.morulla_jadwal||0}\n` +
+`2. Hadir hari ini : ${F.morulla_hadir||0}\n\n` +
+`  ================\n\n` +
+`Capaian Harian \n\n` +
+`* Total Kunj Harian : ${totalKunj} (${pctKunj}%)\n` +
+`* Pendapatan MCU :  Rp ${fmtRp(F.pend_mcu)}\n` +
+`* Pendapatan selain MCU: Rp ${fmtRp(F.pend_non_mcu)}\n` +
+`* Total Pendapatan: Rp ${fmtRp(totalPend)} (${pctPend}%)\n` +
+`* Target harian : Rp ${fmtRp(F.target_omzet_harian)}\n\n` +
+`----------------\nRerata Jumlah entryan Per pasien : Rp ${fmtRp(rataRata)}/Pasien\n---------------\n\n` +
+`================\nCAPAIAN 01-${String(tglAkhir).padStart(2,'0')} ${bulanStr}\n\n` +
+`* Total pendapatan : Rp ${fmtRp(F.kumul_omzet)} (${pctKumulOmzet}%)\n\n` +
+`* Total kunjungan  :  ${fmtRp(F.kumul_kunj)} (${pctKumulKunj}%)\n` +
+`----------------------------------\nData\nTarget ${bulanStr}\n` +
+`* Kunjungan : ${fmtRp(F.target_kunj_bulan)}\n` +
+`* Omzet : Rp.${fmtRp(F.target_omzet_bulan)}`;
+}
+
+function updatePreview() {
+  const el = document.getElementById('laporan-preview');
+  if (el) el.textContent = buildLaporan();
+  // update auto fields
+  const totalKunj = (F.rj||0)+(F.ri||0)+(F.igd||0)+(F.mcu||0);
+  const totalPend = (F.pend_mcu||0)+(F.pend_non_mcu||0);
+  const set = (id, val) => { const e=document.getElementById(id); if(e) e.value=val; };
+  set('auto_total_kunj', totalKunj);
+  set('auto_total_pend', 'Rp '+fmtRp(totalPend));
+  set('auto_pct_kunj',   pct(totalKunj, F.target_kunj_harian)+'%');
+  set('auto_pct_pend',   pct(totalPend, F.target_omzet_harian)+'%');
+  set('auto_rata',       'Rp '+fmtRp(totalKunj>0?Math.round(totalPend/totalKunj):0));
+}
+
+function setF(key, val) {
+  if (['pend_mcu','pend_non_mcu','target_omzet_harian','target_omzet_bulan','kumul_omzet'].includes(key)) {
+    F[key] = parseRp(val);
+  } else if (['tanggal'].includes(key)) {
+    F[key] = val;
+  } else {
+    F[key] = parseInt(val) || 0;
+  }
+  updatePreview();
+}
+
+function toggleSec(id) {
+  const body = document.getElementById('sec-'+id);
+  const head = document.getElementById('head-'+id);
+  if (!body || !head) return;
+  body.classList.toggle('hidden');
+  head.classList.toggle('closed');
+}
+
+function copyLaporan() {
+  const text = buildLaporan();
+  navigator.clipboard.writeText(text).then(() => showToast('✓ Teks laporan berhasil disalin!')).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); showToast('✓ Teks laporan berhasil disalin!');
+  });
+}
+
+function shareWA() {
+  const text = encodeURIComponent(buildLaporan());
+  window.open('https://wa.me/?text='+text, '_blank');
+}
+
+function resetForm() {
+  const keys = ['rj','rj_non_bpjs','ri','ri_non_bpjs','igd','igd_non_bpjs','mcu',
+    'rujukan_grahu','rujukan_ppk1','rujukan_satkal','rujukan_luar','poli_exclusive','poli_prioritas',
+    'bri_igd_kry','bri_igd_kel','bri_rajal_kry','bri_rajal_kel','bri_rawin_kry','bri_rawin_kel',
+    'morulla_jadwal','morulla_hadir',
+    'pend_mcu','pend_non_mcu','kumul_omzet','kumul_kunj'];
+  keys.forEach(k => F[k] = 0);
+  F.promoVals = F.promoVals.map(() => 0);
+  F.tanggal = new Date().toISOString().slice(0,10);
+  renderLaporan();
+  showToast('🔄 Form direset');
+}
+
+function addPromo() {
+  F.promoList.push('Paket baru');
+  F.promoVals.push(0);
+  renderLaporan();
+  // Fokus ke input nama paket baru
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.promo-name-input');
+    if (inputs.length) { 
+      const last = inputs[inputs.length-1];
+      last.focus(); last.select();
+    }
+    // Pastikan section promo terbuka
+    const body = document.getElementById('sec-promo');
+    const head = document.getElementById('head-promo');
+    if (body) body.classList.remove('hidden');
+    if (head) head.classList.remove('closed');
+  }, 50);
+}
+
+function delPromo(i) {
+  if (F.promoList.length <= 1) { showToast('Minimal 1 paket promo'); return; }
+  F.promoList.splice(i, 1);
+  F.promoVals.splice(i, 1);
+  renderLaporan();
+  const body = document.getElementById('sec-promo');
+  const head = document.getElementById('head-promo');
+  if (body) body.classList.remove('hidden');
+  if (head) head.classList.remove('closed');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id='toast'; t.className='toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function inp(key, label, subLabel, cls='', placeholder='0') {
+  const val = F[key] || 0;
+  const displayVal = cls.includes('rp') ? fmtRp(val) : val;
+  return `<div class="fcol">
+    <label>${label}${subLabel?` <span class="sub">${subLabel}</span>`:''}
+    </label>
+    <input class="finput${cls?' '+cls:''}" value="${displayVal}" placeholder="${placeholder}"
+      oninput="setF('${key}',this.value)" inputmode="${cls.includes('rp')?'numeric':'numeric'}">
+  </div>`;
+}
+
+function inpAuto(id, label) {
+  return `<div class="fcol">
+    <label>${label}</label>
+    <input class="finput auto" id="${id}" value="0" readonly>
+  </div>`;
+}
+
+function renderLaporan() {
+  const el = document.getElementById('main');
+  el.innerHTML = `
+<div class="form-wrap fadein">
+
+  <!-- Hero header -->
+  <div class="form-hero">
+    <h2>📋 Input Laporan Harian</h2>
+    <p>Isi data di bawah → teks laporan terbentuk otomatis → salin ke WA</p>
+    <div class="form-date-row">
+      <input type="date" class="form-date-input" value="${F.tanggal}"
+        onchange="setF('tanggal',this.value)">
+      <span style="color:rgba(255,255,255,.7);font-size:13px" id="tgl-display">${getTglStr()}</span>
+    </div>
+  </div>
+
+  <!-- Target bulan (lipat) -->
+  <div class="form-section">
+    <div class="fsec-head closed" id="head-target" onclick="toggleSec('target')">
+      <div class="fsec-icon" style="background:#fffbeb">🎯</div>
+      <div class="fsec-title">Target Bulan <span style="font-size:11px;font-weight:400;color:var(--mu)">(klik untuk expand — isi sekali per bulan)</span></div>
+      <div class="fsec-arr">▾</div>
+    </div>
+    <div class="fsec-body hidden" id="sec-target">
+      <div class="target-bar">
+        <div class="target-item"><label>Target Kunjungan Harian</label>
+          <input class="target-val" value="${F.target_kunj_harian}" oninput="setF('target_kunj_harian',this.value)" inputmode="numeric"></div>
+        <div class="target-item"><label>Target Omzet Harian</label>
+          <input class="target-val" value="${fmtRp(F.target_omzet_harian)}" oninput="setF('target_omzet_harian',this.value)" inputmode="numeric"></div>
+        <div class="target-item"><label>Target Kunjungan Bulan</label>
+          <input class="target-val" value="${F.target_kunj_bulan}" oninput="setF('target_kunj_bulan',this.value)" inputmode="numeric"></div>
+        <div class="target-item"><label>Target Omzet Bulan</label>
+          <input class="target-val" value="${fmtRp(F.target_omzet_bulan)}" oninput="setF('target_omzet_bulan',this.value)" inputmode="numeric"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A. Kunjungan -->
+  <div class="form-section">
+    <div class="fsec-head" id="head-kunj" onclick="toggleSec('kunj')">
+      <div class="fsec-icon" style="background:#eff6ff">🏥</div>
+      <div class="fsec-title">Kunjungan Pasien</div>
+      <div class="fsec-arr">▾</div>
+    </div>
+    <div class="fsec-body" id="sec-kunj">
+      <div class="fgrid">
+        ${inp('rj','Rawat Jalan')}
+        ${inp('rj_non_bpjs','','Non BPJS')}
+        ${inp('ri','Rawat Inap')}
+        ${inp('ri_non_bpjs','','Non BPJS')}
+        ${inp('igd','IGD')}
+        ${inp('igd_non_bpjs','','Non BPJS')}
+        ${inp('mcu','MCU')}
+        ${inpAuto('auto_total_kunj','Total Kunjungan (otomatis)')}
+        <hr class="fhr">
+        ${inp('rujukan_grahu','Rujukan SBU/Grahu')}
+        ${inp('rujukan_ppk1','Rujukan SBU/PPK1')}
+        ${inp('rujukan_satkal','Rujukan SBU/Satkal')}
+        ${inp('rujukan_luar','Rujukan Dokter Luar')}
+        ${inp('poli_exclusive','Poli Exclusive')}
+        ${inp('poli_prioritas','Poli Prioritas')}
+      </div>
+    </div>
+  </div>
+
+  <!-- B. BRI Life -->
+  <div class="form-section">
+    <div class="fsec-head" id="head-bri" onclick="toggleSec('bri')">
+      <div class="fsec-icon" style="background:#fff1f2">🔵</div>
+      <div class="fsec-title">Pasien BRI LIFE PG</div>
+      <div class="fsec-arr">▾</div>
+    </div>
+    <div class="fsec-body" id="sec-bri">
+      <div class="fgrid3">
+        ${inp('bri_igd_kry','IGD BRI Life Kry PG')}
+        ${inp('bri_igd_kel','IGD BRI Life Kel PG')}
+        <div></div>
+        ${inp('bri_rajal_kry','Rajal BRI Life Kry PG')}
+        ${inp('bri_rajal_kel','Rajal BRI Life Kel PG')}
+        <div></div>
+        ${inp('bri_rawin_kry','Rawin BRI Life Kry PG')}
+        ${inp('bri_rawin_kel','Rawin BRI Life Kel PG')}
+      </div>
+    </div>
+  </div>
+
+  <!-- C. Promo Lab -->
+  <div class="form-section">
+    <div class="fsec-head" id="head-promo" onclick="toggleSec('promo')">
+      <div class="fsec-icon" style="background:#f5f3ff">🧪</div>
+      <div class="fsec-title">Promo Lab <span style="font-size:11px;font-weight:400;color:var(--mu)">(${F.promoList.length} paket · bisa tambah/hapus)</span></div>
+      <div class="fsec-arr">▾</div>
+    </div>
+    <div class="fsec-body" id="sec-promo">
+      <div id="promo-rows">
+        ${F.promoList.map((nama, i) => `
+        <div class="promo-row" id="promo-row-${i}">
+          <div class="promo-num">${i+1}</div>
+          <input class="promo-name-input" value="${nama}"
+            onchange="F.promoList[${i}]=this.value; updatePreview()"
+            placeholder="Nama paket promo">
+          <input class="finput" style="width:90px;text-align:right" value="${F.promoVals[i]||0}"
+            oninput="F.promoVals[${i}]=parseInt(this.value)||0; updatePreview()" inputmode="numeric">
+          <button class="promo-del" onclick="delPromo(${i})" title="Hapus paket ini">✕</button>
+        </div>`).join('')}
+      </div>
+      <button class="promo-add-btn" onclick="addPromo()">+ Tambah Paket Promo</button>
+    </div>
+  </div>
+
+  <!-- D. AS Morulla -->
+  <div class="form-section">
+    <div class="fsec-head" id="head-mor" onclick="toggleSec('mor')">
+      <div class="fsec-icon" style="background:#ecfdf5">🟢</div>
+      <div class="fsec-title">Pasien AS Morulla</div>
+      <div class="fsec-arr">▾</div>
+    </div>
+    <div class="fsec-body" id="sec-mor">
+      <div class="fgrid">
+        ${inp('morulla_jadwal','Terjadwal Hari Ini')}
+        ${inp('morulla_hadir','Hadir Hari Ini')}
+      </div>
+    </div>
+  </div>
+
+  <!-- E. Pendapatan -->
+  <div class="form-section">
+    <div class="fsec-head" id="head-pend" onclick="toggleSec('pend')">
+      <div class="fsec-icon" style="background:#e8f8f5">💰</div>
+      <div class="fsec-title">Pendapatan Harian</div>
+      <div class="fsec-arr">▾</div>
+    </div>
+    <div class="fsec-body" id="sec-pend">
+      <div class="fgrid">
+        ${inp('pend_mcu','Pendapatan MCU','','rp','0')}
+        ${inp('pend_non_mcu','Pendapatan Selain MCU','','rp','0')}
+        ${inpAuto('auto_total_pend','Total Pendapatan (otomatis)')}
+        ${inpAuto('auto_pct_pend','% dari Target Harian')}
+        ${inpAuto('auto_rata','Rerata per Pasien (otomatis)')}
+      </div>
+    </div>
+  </div>
+
+  <!-- F. Kumulatif -->
+  <div class="form-section">
+    <div class="fsec-head" id="head-kumul" onclick="toggleSec('kumul')">
+      <div class="fsec-icon" style="background:#fffbeb">📊</div>
+      <div class="fsec-title">Capaian Kumulatif Bulan Ini
+        ${S.kumulatifLoaded
+          ? `<span style="font-size:11px;font-weight:400;color:var(--ac)">✓ s/d tgl ${S.kumulatifTgl} — dari Sheets</span>`
+          : `<span style="font-size:11px;font-weight:400;color:var(--mu)">${GS_URL.trim() ? 'memuat dari Sheets...' : 'isi manual (GS_URL belum diset)'}</span>`
+        }
+      </div>
+      <div class="fsec-arr">▾</div>
+    </div>
+    <div class="fsec-body" id="sec-kumul">
+      ${GS_URL.trim() ? `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 12px;background:var(--ac-l);border:1px solid rgba(13,158,132,.2);border-radius:9px;font-size:12px;color:var(--ac-d)">
+        <span>⚡</span>
+        <span>Data kumulatif diambil otomatis dari Google Sheets (OMSET HARIAN 2026)</span>
+        <button onclick="fetchKumulatif(); showToast('🔄 Memuat kumulatif...')" style="margin-left:auto;background:var(--ac);color:#fff;border:none;border-radius:7px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer">🔄 Refresh</button>
+      </div>` : `
+      <div style="padding:10px 12px;background:#fffbeb;border:1px solid rgba(245,158,11,.2);border-radius:9px;font-size:12px;color:#92400e;margin-bottom:12px">
+        ⚠️ GS_URL belum diisi. Isi manual atau hubungkan ke Google Sheets.
+      </div>`}
+      <div class="fgrid">
+        ${inp('kumul_omzet','Total Omzet s/d Hari Ini','','rp')}
+        ${inp('kumul_kunj','Total Kunjungan s/d Hari Ini','')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-wrap">
+    <div class="preview-head">
+      <span>PRATINJAU LAPORAN — siap disalin</span>
+      <div class="preview-acts">
+        <button class="btn-copy btn-reset" onclick="resetForm()">🔄 Reset</button>
+        <button class="btn-copy" onclick="copyLaporan()">📋 Salin Teks</button>
+        <button class="btn-wa" onclick="shareWA()">📲 Bagikan via WA</button>
+      </div>
+    </div>
+    <pre class="preview-text" id="laporan-preview">${buildLaporan()}</pre>
+  </div>
+
+</div>`;
+  updatePreview();
+}
+
+// ══════════════════════════════════════════════
+// OMZET MCU HARIAN
+// ══════════════════════════════════════════════
+function renderMcu() {
+  const el = document.getElementById('main');
+  const mcuData = S.data.mcu || {};
+  const months  = Object.keys(mcuData);
+  const mn      = S.mcuMonth || months[months.length-1];
+  const rows    = (mcuData[mn] || []).filter(r => r.omzet > 0);
+
+  if (!rows.length) {
+    el.innerHTML = `<div class="main"><div style="text-align:center;padding:60px 20px;color:var(--mu)">
+      <div style="font-size:40px;margin-bottom:12px">🔬</div>
+      <div style="font-size:16px;font-weight:600">Belum ada data MCU untuk ${mn}</div>
+    </div></div>`;
+    return;
+  }
+
+  const total   = rows.reduce((s,r) => s + r.omzet, 0);
+  const avg     = total / rows.length;
+  const maxRow  = rows.reduce((a,b) => b.omzet > a.omzet ? b : a);
+  const minRow  = rows.reduce((a,b) => b.omzet < a.omzet ? b : a);
+
+  // Compare months for KPI
+  const prevMonths = months.filter(m => m !== mn);
+  const prevMn  = prevMonths[prevMonths.length-1];
+  const prevRows = prevMn ? (mcuData[prevMn]||[]).filter(r=>r.omzet>0) : [];
+  const prevTotal = prevRows.reduce((s,r)=>s+r.omzet,0);
+  const growthPct = prevTotal > 0 ? ((total-prevTotal)/prevTotal*100).toFixed(1) : null;
+
+  const fmtM = v => {
+    const jt = v/1e6;
+    if (jt >= 1000) return 'Rp ' + jt.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' jt';
+    return 'Rp ' + jt.toFixed(1) + ' jt';
+  };
+  const fmtFull = v => 'Rp ' + Math.round(v).toLocaleString('id-ID');
+
+  const DAYS = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const MONTH_IDX = {JAN:0,FEB:1,MAR:2,APR:3,MEI:4,JUN:5,JUL:6,AGS:7,SEP:8,OKT:9,NOV:10,DES:11};
+  const mIdx = MONTH_IDX[mn] ?? 0;
+  const getDow = d => { const dt = new Date(2026, mIdx, d); return DAYS[dt.getDay()]; };
+
+  const gridColor = '#e8edf4';
+  const labels = rows.map(r => `${getDow(r.d)} ${r.d}`);
+  const values = rows.map(r => r.omzet);
+
+  // Bar colors: green if >= avg, orange below
+  const barColors = values.map(v => v >= avg ? 'rgba(13,158,132,0.75)' : 'rgba(245,158,11,0.65)');
+  const barBorders = values.map(v => v >= avg ? '#0a9e87' : '#f59e0b');
+
+  // Table rows
+  const tableRows = rows.map(r => `
+    <tr>
+      <td style="font-weight:600;color:var(--mu)">${getDow(r.d)} ${r.d}</td>
+      <td style="font-weight:700;color:var(--tx);text-align:right">${fmtFull(r.omzet)}</td>
+      <td style="text-align:right">
+        <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end">
+          <div style="width:80px;height:6px;background:var(--bd);border-radius:3px;overflow:hidden">
+            <div style="width:${Math.min(100,r.omzet/maxRow.omzet*100).toFixed(0)}%;height:100%;background:${r.omzet>=avg?'var(--ac)':'#f59e0b'};border-radius:3px"></div>
+          </div>
+          <span style="font-size:11px;color:var(--mu);font-family:'DM Mono',monospace;min-width:36px;text-align:right">
+            ${(r.omzet/total*100).toFixed(1)}%
+          </span>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  el.innerHTML = `<div class="main fadein">
+    <!-- KPI row -->
+    <div class="kpi-row">
+      <div class="kpi" style="--kc:#0a9e87;--kbg:#e6f7f4">
+        <div class="kpi-ico">🔬</div>
+        <div class="kpi-lbl">Total Omzet MCU ${mn}</div>
+        <div class="kpi-val">${fmtM(total)}</div>
+        <div class="kpi-sub">${rows.length} hari tercatat</div>
+      </div>
+      <div class="kpi" style="--kc:#3b82f6;--kbg:#eff6ff">
+        <div class="kpi-ico">📊</div>
+        <div class="kpi-lbl">Rata-rata / Hari</div>
+        <div class="kpi-val">${fmtM(avg)}</div>
+        <div class="kpi-sub">per hari aktif</div>
+      </div>
+      <div class="kpi" style="--kc:#f59e0b;--kbg:#fef3c7">
+        <div class="kpi-ico">🏆</div>
+        <div class="kpi-lbl">Tertinggi</div>
+        <div class="kpi-val">${fmtM(maxRow.omzet)}</div>
+        <div class="kpi-sub">Tgl ${maxRow.d} ${mn}</div>
+      </div>
+      <div class="kpi" style="--kc:#e11d48;--kbg:#fff1f2">
+        <div class="kpi-ico">📉</div>
+        <div class="kpi-lbl">Terendah</div>
+        <div class="kpi-val">${fmtM(minRow.omzet)}</div>
+        <div class="kpi-sub">Tgl ${minRow.d} ${mn}</div>
+      </div>
+      ${growthPct !== null ? `
+      <div class="kpi" style="--kc:${parseFloat(growthPct)>=0?'#0a9e87':'#e11d48'};--kbg:${parseFloat(growthPct)>=0?'#e6f7f4':'#fff1f2'}">
+        <div class="kpi-ico">${parseFloat(growthPct)>=0?'📈':'📉'}</div>
+        <div class="kpi-lbl">vs ${prevMn}</div>
+        <div class="kpi-val">${parseFloat(growthPct)>=0?'+':''}${growthPct}%</div>
+        <div class="kpi-sub">${fmtM(prevTotal)} bulan lalu</div>
+      </div>` : ''}
+    </div>
+
+    <!-- Chart -->
+    <div class="card fadein" style="padding:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:14px;font-weight:700">Omzet MCU Harian — ${mn} 2026</div>
+          <div style="font-size:11px;color:var(--mu);margin-top:2px">
+            <span style="display:inline-block;width:10px;height:10px;background:#0a9e87;border-radius:2px;margin-right:4px"></span>≥ rata-rata &nbsp;
+            <span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>di bawah rata-rata
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--mu);font-family:'DM Mono',monospace">
+          Rata-rata: ${fmtFull(avg)}
+        </div>
+      </div>
+      <div style="height:260px"><canvas id="chart-mcu-bar"></canvas></div>
+    </div>
+
+    <!-- Table -->
+    <div class="card fadein" style="padding:20px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:14px">📋 Detail Harian MCU — ${mn} 2026</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:2px solid var(--bd)">
+              <th style="padding:8px 12px;text-align:left;color:var(--mu);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Tgl</th>
+              <th style="padding:8px 12px;text-align:right;color:var(--mu);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Omzet MCU</th>
+              <th style="padding:8px 12px;text-align:right;color:var(--mu);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em">Kontribusi</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+          <tfoot>
+            <tr style="border-top:2px solid var(--bd);background:var(--bg)">
+              <td style="padding:10px 12px;font-weight:700">TOTAL</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:800;color:var(--ac)">${fmtFull(total)}</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:600;color:var(--mu)">100%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>`;
+
+  // Render chart after DOM
+  requestAnimationFrame(() => {
+    const ctx = document.getElementById('chart-mcu-bar');
+    if (!ctx) return;
+    const chartId = 'mcu-bar';
+    S.charts[chartId] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Omzet MCU',
+          data: values,
+          backgroundColor: barColors,
+          borderColor: barBorders,
+          borderWidth: 1.5,
+          borderRadius: 4,
+        }, {
+          label: 'Rata-rata',
+          data: new Array(values.length).fill(avg),
+          type: 'line',
+          borderColor: '#e11d48',
+          borderWidth: 1.5,
+          borderDash: [5,4],
+          pointRadius: 0,
+          fill: false,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode:'index', intersect:false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                if (ctx.dataset.label === 'Rata-rata') return ' Rata-rata: ' + fmtFull(ctx.parsed.y);
+                return ' Omzet MCU: ' + fmtFull(ctx.parsed.y);
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid:{display:false}, ticks:{font:{size:10}, maxRotation:45} },
+          y: {
+            grid:{color:gridColor},
+            ticks:{
+              callback: v => {
+                const jt = v/1e6;
+                if (jt >= 1000) return 'Rp ' + (jt/1000).toFixed(1) + ' M';
+                return 'Rp ' + jt.toFixed(0) + ' jt';
+              },
+              font:{size:10}
+            }
+          }
+        }
+      }
+    });
+  });
+}
+
+// ══════════════════════════════════════════════
+// CHART DEFAULTS — light theme
+// ══════════════════════════════════════════════
+Chart.defaults.color = '#7a8fa8';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyleWidth = 8;
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function destroyCharts() {
+  Object.values(S.charts).forEach(c => { try { c.destroy(); } catch(e){} });
+  S.charts = {};
+}
+
+function render() {
+  destroyCharts();
+  buildTabs();
+  if (S.tab === 'omzet') renderOmzet();
+  else if (S.tab === 'kunjungan') renderKunjungan();
+  else if (S.tab === 'mcu') renderMcu();
+  else renderLaporan();
+}
+
+function buildTabs() {
+  const el = document.getElementById('tabs');
+  const omzetMs = Object.keys(S.data.omzet);
+  const kunjMs  = Object.keys(S.data.kunjungan);
+  const mcuMs   = Object.keys(S.data.mcu || {});
+
+  // Month selectors: only show when tab is active
+  const omzetSel = `<select class="month-select" onchange="setMonth('omzet',this.value)" title="Pilih bulan">
+    ${omzetMs.map(m=>`<option value="${m}" ${S.month===m&&S.tab==='omzet'?'selected':''}>${m}</option>`).join('')}
+  </select>`;
+
+  const kunjSel = `<select class="month-select" onchange="setMonth('kunjungan',this.value)" title="Pilih bulan">
+    ${kunjMs.map(m=>`<option value="${m}" ${S.month===m&&S.tab==='kunjungan'?'selected':''}>${m}</option>`).join('')}
+  </select>`;
+
+  const mcuSel = mcuMs.length ? `<select class="month-select" onchange="setMcuMonth(this.value)" title="Pilih bulan">
+    ${mcuMs.map(m=>`<option value="${m}" ${S.mcuMonth===m?'selected':''}>${m}</option>`).join('')}
+  </select>` : '';
+
+  let h = '';
+  h += `<button class="tab ${S.tab==='omzet'?'active':''}" onclick="setTab('omzet')">💰 Omzet</button>`;
+  if (S.tab==='omzet') h += omzetSel;
+
+  h += '<div class="tab-divider"></div>';
+  h += `<button class="tab ${S.tab==='kunjungan'?'active':''}" onclick="setTab('kunjungan')">👥 Kunjungan</button>`;
+  if (S.tab==='kunjungan') h += kunjSel;
+
+  h += '<div class="tab-divider"></div>';
+  h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 MCU</button>`;
+  if (S.tab==='mcu') h += mcuSel;
+
+  h += '<div class="tab-divider"></div>';
+  h += `<button class="tab ${S.tab==='laporan'?'active':''}" onclick="setTab('laporan')">📋 Laporan</button>`;
+
+  el.innerHTML = h;
+}
+
+function setTab(t) {
+  S.tab = t;
+  if (t === 'omzet' || t === 'kunjungan') {
+    const ms = Object.keys(S.data[t]);
+    if (!ms.includes(S.month)) S.month = ms[ms.length-1];
+  } else if (t === 'mcu') {
+    const ms = Object.keys(S.data.mcu || {});
+    if (!ms.includes(S.mcuMonth)) S.mcuMonth = ms[ms.length-1];
+  }
+  render();
+}
+function setMcuMonth(m) { S.tab = 'mcu'; S.mcuMonth = m; render(); }
+
+function setMonth(t, m) { S.tab = t; S.month = m; render(); }
+
+// ══════════════════════════════════════════════
+// OMZET
+// ══════════════════════════════════════════════
+const PAYERS = [
+  {k:'petrokimia', l:'PT Petrokimia',   c:'#e11d48'},
+  {k:'perusahaan', l:'Perusahaan Lain', c:'#3b82f6'},
+  {k:'bri',        l:'BRI (PG)',        c:'#f59e0b'},
+  {k:'asuransi',   l:'Asuransi Kom.',   c:'#8b5cf6'},
+  {k:'prokMurni',  l:'Prokespen Murni', c:'#06b6d4'},
+  {k:'prokBpjs',   l:'Prokespen BPJS',  c:'#10b981'},
+  {k:'bpjsKes',    l:'BPJS Kesehatan',  c:'#0a9e87'},
+  {k:'bpjsTK',     l:'BPJS TK',         c:'#f97316'},
+  {k:'umum',       l:'Umum',            c:'#6366f1'},
+];
+
+const fmt  = v => {
+  if (!v) return 'Rp 0';
+  const jt = v / 1e6;
+  if (jt >= 1000) {
+    // Format as X.XXX,X jt with dot separator
+    return 'Rp ' + jt.toLocaleString('id-ID', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' jt';
+  }
+  return 'Rp ' + jt.toFixed(1) + ' jt';
+};
+const fmtF = v => 'Rp ' + Number(v).toLocaleString('id-ID');
+const badge = p => {
+  if(p>=150) return `<span class="bp">${p}%</span>`;
+  if(p>=100) return `<span class="bg">${p}%</span>`;
+  if(p>=80)  return `<span class="by">${p}%</span>`;
+  return `<span class="br">${p}%</span>`;
+};
+
+function renderOmzet() {
+  const rows = S.data.omzet[S.month] || [];
+  if (!rows.length) { document.getElementById('main').innerHTML = '<div style="padding:60px;text-align:center;color:var(--mu)">Belum ada data untuk bulan ini</div>'; return; }
+
+  const tot    = rows.reduce((s,r) => s+r.total, 0);
+  const dHit   = rows.filter(r => r.pct >= 100).length;
+  const best   = rows.reduce((a,b) => b.pct>a.pct?b:a);
+  const avgPct = Math.round(rows.reduce((s,r) => s+r.pct, 0) / rows.length);
+  const avgTgt = rows.reduce((s,r) => s+r.target, 0) / rows.length;
+
+  const payerHtml = PAYERS.map(p => {
+    const t  = rows.reduce((s,r) => s+(r[p.k]||0), 0);
+    const sh = ((t/tot)*100).toFixed(1);
+    return `<div class="pc" style="--pcc:${p.c}">
+      <div class="pc-n">${p.l}</div>
+      <div class="pc-v" style="color:${p.c}">${fmt(t)}</div>
+      <div class="pc-p">${sh}% dari total</div>
+    </div>`;
+  }).join('');
+
+  const tblHtml = rows.map(r => `<tr>
+    <td>${r.d}</td>
+    <td>${r.petrokimia?fmt(r.petrokimia):'—'}</td>
+    <td>${fmt(r.perusahaan)}</td>
+    <td>${fmt(r.bri)}</td>
+    <td>${fmt(r.asuransi)}</td>
+    <td>${r.prokMurni?fmt(r.prokMurni):'—'}</td>
+    <td>${fmt(r.prokBpjs)}</td>
+    <td>${fmt(r.bpjsKes)}</td>
+    <td>${r.bpjsTK?fmt(r.bpjsTK):'—'}</td>
+    <td>${fmt(r.umum)}</td>
+    <td style="font-weight:600;color:var(--tx)">${fmt(r.total)}</td>
+    <td style="color:var(--mu)">${fmt(r.target)}</td>
+    <td>${badge(r.pct)}</td>
+  </tr>`).join('');
+
+  document.getElementById('main').innerHTML = `
+  <div class="fadein">
+    <div class="kpi-row">
+      <div class="kpi" style="--kc:#0a9e87;--kbg:#e6f7f4"><div class="kpi-ico">💰</div><div class="kpi-lbl">Total Omzet ${S.month}</div><div class="kpi-val">${fmt(tot)}</div><div class="kpi-sub">${rows.length} hari tercatat</div></div>
+      <div class="kpi" style="--kc:#3b82f6;--kbg:#eff6ff"><div class="kpi-ico">🎯</div><div class="kpi-lbl">Avg Target / Hari</div><div class="kpi-val">${fmt(avgTgt)}</div><div class="kpi-sub">Target rata-rata harian</div></div>
+      <div class="kpi" style="--kc:#f59e0b;--kbg:#fef3c7"><div class="kpi-ico">✅</div><div class="kpi-lbl">Hari Capai Target</div><div class="kpi-val">${dHit} hari</div><div class="kpi-sub">dari ${rows.length} hari data</div></div>
+      <div class="kpi" style="--kc:#e11d48;--kbg:#fff1f2"><div class="kpi-ico">🏆</div><div class="kpi-lbl">Capaian Tertinggi</div><div class="kpi-val">${best.pct}%</div><div class="kpi-sub">Tgl ${best.d} ${S.month}</div></div>
+      <div class="kpi" style="--kc:#8b5cf6;--kbg:#f3f0ff"><div class="kpi-ico">⚡</div><div class="kpi-lbl">Avg Capaian</div><div class="kpi-val">${avgPct}%</div><div class="kpi-sub">Rata-rata per hari</div></div>
+    </div>
+
+    <div class="payer-grid">${payerHtml}</div>
+
+    <div class="grid2">
+      <div class="card fw">
+        <div class="card-head">
+          <div class="card-t">Omzet Harian vs Target — ${S.month}</div>
+          <div class="card-s">Hijau = melampaui target &nbsp;·&nbsp; Biru = di bawah target &nbsp;·&nbsp; Garis oranye = target</div>
+        </div>
+        <canvas id="cDaily"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-t">Capaian % per Hari</div>
+          <div class="card-s">≥150% ungu &nbsp;·&nbsp; ≥100% hijau &nbsp;·&nbsp; ≥80% kuning &nbsp;·&nbsp; <80% merah</div>
+        </div>
+        <canvas id="cPct"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-t">Komposisi Payer — ${S.month}</div>
+          <div class="card-s">Porsi kontribusi tiap sumber pembiayaan</div>
+        </div>
+        <canvas id="cPie"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-t">Detail Data Harian — ${S.month}</div>
+        <div class="card-s">Semua kategori payer per hari (dalam jutaan Rp)</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Tgl</th><th>Petrokimia</th><th>Perush.</th><th>BRI</th>
+            <th>Asuransi</th><th>Prok.Murni</th><th>Prok.BPJS</th>
+            <th>BPJS Kes</th><th>BPJS TK</th><th>Umum</th>
+            <th>Total</th><th>Target</th><th>Capaian</th>
+          </tr></thead>
+          <tbody>${tblHtml}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+
+  // ── Charts ──
+  const days = rows.map(r => r.d);
+  const gridColor = 'rgba(26,37,53,.06)';
+
+  S.charts.daily = new Chart(document.getElementById('cDaily'), {
+    data: { labels: days, datasets: [
+      { type:'bar', label:'Omzet Aktual',
+        data: rows.map(r=>r.total),
+        backgroundColor: rows.map(r => r.pct>=100 ? 'rgba(10,158,135,.7)' : 'rgba(59,130,246,.55)'),
+        borderColor:     rows.map(r => r.pct>=100 ? '#0a9e87' : '#3b82f6'),
+        borderWidth: 1, borderRadius: 5, borderSkipped: false },
+      { type:'line', label:'Target',
+        data: rows.map(r=>r.target),
+        borderColor: '#f59e0b', borderDash:[5,4], borderWidth:2,
+        pointRadius:3, pointBackgroundColor:'#f59e0b',
+        tension:.35, fill:false }
+    ]},
+    options: { responsive:true, interaction:{mode:'index'},
+      plugins:{ legend:{position:'top', labels:{padding:16}} ,
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmtF(c.raw)}`},
+          backgroundColor:'#fff', titleColor:'#1a2535', bodyColor:'#3d5068',
+          borderColor:'#dde4ee', borderWidth:1, padding:10 }} ,
+      scales:{
+        x:{ grid:{color:gridColor}, ticks:{font:{size:10}} },
+        y:{ grid:{color:gridColor}, ticks:{callback:v=>'Rp '+(v/1e6).toFixed(0)+'jt', font:{size:10}} }
+      }}
+  });
+
+  S.charts.pct = new Chart(document.getElementById('cPct'), {
+    type:'bar',
+    data:{ labels:days, datasets:[{ label:'Capaian %',
+      data: rows.map(r=>r.pct),
+      backgroundColor: rows.map(r =>
+        r.pct>=150 ? 'rgba(139,92,246,.7)' :
+        r.pct>=100 ? 'rgba(10,158,135,.7)' :
+        r.pct>=80  ? 'rgba(245,158,11,.7)' : 'rgba(240,78,55,.65)'),
+      borderRadius:5 }]},
+    options:{ responsive:true,
+      plugins:{ legend:{display:false},
+        tooltip:{callbacks:{label:c=>` Capaian: ${c.raw}%`},
+          backgroundColor:'#fff', titleColor:'#1a2535', bodyColor:'#3d5068',
+          borderColor:'#dde4ee', borderWidth:1, padding:10 }},
+      scales:{
+        x:{grid:{color:gridColor}, ticks:{font:{size:10}}},
+        y:{grid:{color:gridColor}, ticks:{callback:v=>v+'%', font:{size:10}}, min:0}
+      }}
+  });
+
+  const pt = PAYERS.map(p => rows.reduce((s,r)=>s+(r[p.k]||0),0));
+  S.charts.pie = new Chart(document.getElementById('cPie'), {
+    type:'doughnut',
+    data:{ labels:PAYERS.map(p=>p.l),
+      datasets:[{ data:pt,
+        backgroundColor: PAYERS.map(p=>p.c+'28'),
+        borderColor:     PAYERS.map(p=>p.c),
+        borderWidth:2, hoverOffset:8 }]},
+    options:{ responsive:true, cutout:'60%',
+      plugins:{ legend:{position:'right', labels:{padding:10, font:{size:10}}},
+        tooltip:{callbacks:{label:c=>` ${c.label}: ${((c.raw/tot)*100).toFixed(1)}%`},
+          backgroundColor:'#fff', titleColor:'#1a2535', bodyColor:'#3d5068',
+          borderColor:'#dde4ee', borderWidth:1, padding:10 }}}
+  });
+}
+
+// ══════════════════════════════════════════════
+// KUNJUNGAN
+// ══════════════════════════════════════════════
+function renderKunjungan() {
+  const rows = S.data.kunjungan[S.month] || [];
+  if (!rows.length) { document.getElementById('main').innerHTML='<div style="padding:60px;text-align:center;color:var(--mu)">Belum ada data kunjungan</div>'; return; }
+
+  const totK   = rows.reduce((s,r)=>s+r.total,0);
+  const dHitK  = rows.filter(r=>r.pct>=100).length;
+  const bestK  = rows.reduce((a,b)=>b.total>a.total?b:a);
+  const avgK   = Math.round(totK/rows.length);
+  const totRJ  = rows.reduce((s,r)=>s+r.rjTotal,0);
+  const totRI  = rows.reduce((s,r)=>s+r.riTotal,0);
+  const totIGD = rows.reduce((s,r)=>s+r.igdTotal,0);
+  const totMCU = rows.reduce((s,r)=>s+r.mcuTotal,0);
+
+  const tblK = rows.map(r=>`<tr>
+    <td>${r.d}</td>
+    <td>${r.rjTotal}</td><td>${r.riTotal}</td>
+    <td>${r.igdTotal}</td><td>${r.mcuTotal}</td>
+    <td style="font-weight:600;color:var(--tx)">${r.total}</td>
+    <td style="color:var(--mu)">${r.target?Math.round(r.target):'—'}</td>
+    <td>${r.pct?badge(r.pct):'—'}</td>
+  </tr>`).join('');
+
+  document.getElementById('main').innerHTML = `
+  <div class="fadein">
+    <div class="kpi-row">
+      <div class="kpi" style="--kc:#0a9e87;--kbg:#e6f7f4"><div class="kpi-ico">👥</div><div class="kpi-lbl">Total Kunjungan ${S.month}</div><div class="kpi-val">${totK.toLocaleString('id-ID')}</div><div class="kpi-sub">${rows.length} hari tercatat</div></div>
+      <div class="kpi" style="--kc:#3b82f6;--kbg:#eff6ff"><div class="kpi-ico">📊</div><div class="kpi-lbl">Avg per Hari</div><div class="kpi-val">${avgK}</div><div class="kpi-sub">Pasien rata-rata harian</div></div>
+      <div class="kpi" style="--kc:#f59e0b;--kbg:#fef3c7"><div class="kpi-ico">✅</div><div class="kpi-lbl">Hari Capai Target</div><div class="kpi-val">${dHitK} hari</div><div class="kpi-sub">dari ${rows.length} hari</div></div>
+      <div class="kpi" style="--kc:#e11d48;--kbg:#fff1f2"><div class="kpi-ico">🏆</div><div class="kpi-lbl">Kunjungan Terbanyak</div><div class="kpi-val">${bestK.total}</div><div class="kpi-sub">Tgl ${bestK.d} ${S.month}</div></div>
+    </div>
+
+    <div class="k-grid">
+      <div class="kc" style="--kcc:#3b82f6"><div class="kc-ico">🚶</div><div class="kc-lbl">Rawat Jalan</div><div class="kc-val" style="color:#3b82f6">${totRJ.toLocaleString()}</div><div class="kc-pct">${((totRJ/totK)*100).toFixed(1)}% dari total</div></div>
+      <div class="kc" style="--kcc:#8b5cf6"><div class="kc-ico">🛏️</div><div class="kc-lbl">Rawat Inap</div><div class="kc-val" style="color:#8b5cf6">${totRI.toLocaleString()}</div><div class="kc-pct">${((totRI/totK)*100).toFixed(1)}% dari total</div></div>
+      <div class="kc" style="--kcc:#e11d48"><div class="kc-ico">🚨</div><div class="kc-lbl">IGD</div><div class="kc-val" style="color:#e11d48">${totIGD.toLocaleString()}</div><div class="kc-pct">${((totIGD/totK)*100).toFixed(1)}% dari total</div></div>
+      <div class="kc" style="--kcc:#f59e0b"><div class="kc-ico">🩺</div><div class="kc-lbl">MCU</div><div class="kc-val" style="color:#f59e0b">${totMCU.toLocaleString()}</div><div class="kc-pct">${((totMCU/totK)*100).toFixed(1)}% dari total</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card fw">
+        <div class="card-head">
+          <div class="card-t">Total Kunjungan Harian — ${S.month}</div>
+          <div class="card-s">Hijau = capai target &nbsp;·&nbsp; Biru = di bawah target</div>
+        </div>
+        <canvas id="cKDaily"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-t">Komposisi Unit Layanan</div>
+          <div class="card-s">Rawat Jalan · Rawat Inap · IGD · MCU</div>
+        </div>
+        <canvas id="cKPie"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-t">Breakdown per Unit Harian</div>
+          <div class="card-s">Stacked bar per unit layanan</div>
+        </div>
+        <canvas id="cKStack"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-t">Detail Kunjungan Harian — ${S.month}</div>
+        <div class="card-s">Per unit layanan</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr>
+            <th>Tgl</th><th>Rawat Jalan</th><th>Rawat Inap</th>
+            <th>IGD</th><th>MCU</th><th>Total</th><th>Target</th><th>Capaian</th>
+          </tr></thead>
+          <tbody>${tblK}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+
+  const days = rows.map(r=>r.d);
+  const gridColor = 'rgba(26,37,53,.06)';
+  const ttOpts = { backgroundColor:'#fff', titleColor:'#1a2535', bodyColor:'#3d5068', borderColor:'#dde4ee', borderWidth:1, padding:10 };
+
+  S.charts.kd = new Chart(document.getElementById('cKDaily'),{
+    data:{labels:days,datasets:[
+      {type:'bar',label:'Total Kunjungan',
+       data:rows.map(r=>r.total),
+       backgroundColor:rows.map(r=>r.pct>=100?'rgba(10,158,135,.7)':'rgba(59,130,246,.55)'),
+       borderColor:rows.map(r=>r.pct>=100?'#0a9e87':'#3b82f6'),
+       borderWidth:1,borderRadius:5},
+      {type:'line',label:'Target',data:rows.map(r=>r.target||null),
+       borderColor:'#f59e0b',borderDash:[5,4],borderWidth:2,
+       pointRadius:3,pointBackgroundColor:'#f59e0b',
+       tension:.3,fill:false,spanGaps:true}
+    ]},
+    options:{responsive:true,interaction:{mode:'index'},
+      plugins:{legend:{position:'top',labels:{padding:16}},tooltip:{...ttOpts}},
+      scales:{x:{grid:{color:gridColor}},y:{grid:{color:gridColor},min:0}}}
+  });
+
+  S.charts.kp = new Chart(document.getElementById('cKPie'),{
+    type:'doughnut',
+    data:{labels:['Rawat Jalan','Rawat Inap','IGD','MCU'],
+      datasets:[{data:[totRJ,totRI,totIGD,totMCU],
+        backgroundColor:['rgba(59,130,246,.2)','rgba(139,92,246,.2)','rgba(225,29,72,.2)','rgba(245,158,11,.2)'],
+        borderColor:['#3b82f6','#8b5cf6','#e11d48','#f59e0b'],
+        borderWidth:2,hoverOffset:8}]},
+    options:{responsive:true,cutout:'58%',
+      plugins:{legend:{position:'bottom',labels:{padding:12}},
+        tooltip:{...ttOpts,callbacks:{label:c=>` ${c.label}: ${c.raw.toLocaleString()} (${((c.raw/totK)*100).toFixed(1)}%)`}}}}
+  });
+
+  S.charts.ks = new Chart(document.getElementById('cKStack'),{
+    type:'bar',
+    data:{labels:days,datasets:[
+      {label:'RJ', data:rows.map(r=>r.rjTotal),  backgroundColor:'rgba(59,130,246,.65)', borderRadius:2},
+      {label:'RI', data:rows.map(r=>r.riTotal),  backgroundColor:'rgba(139,92,246,.65)', borderRadius:2},
+      {label:'IGD',data:rows.map(r=>r.igdTotal), backgroundColor:'rgba(225,29,72,.6)',   borderRadius:2},
+      {label:'MCU',data:rows.map(r=>r.mcuTotal), backgroundColor:'rgba(245,158,11,.65)', borderRadius:2},
+    ]},
+    options:{responsive:true,interaction:{mode:'index'},
+      plugins:{legend:{position:'top',labels:{padding:14}},tooltip:{...ttOpts}},
+      scales:{
+        x:{grid:{color:gridColor},stacked:true},
+        y:{grid:{color:gridColor},stacked:true,min:0}
+      }}
+  });
+}
+</script>
+</body>
+</html>

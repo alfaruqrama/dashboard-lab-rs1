@@ -1,0 +1,11 @@
+[build]
+  # Tidak ada proses build — langsung publish file statis
+  publish = "."
+  functions = "netlify/functions"
+
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    # Pastikan function hanya bisa dipanggil dari domain yang sama
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
