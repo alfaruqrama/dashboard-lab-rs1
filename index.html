@@ -576,8 +576,8 @@ const S = {
 window.onload = () => {
   if (GS_URL.trim()) {
     connectGS(); // fetchKumulatif dipanggil otomatis di dalam connectGS
-    // ✅ AUTO-REFRESH SETIAP 60 DETIK
-    setInterval(connectGS, 60000);
+    // ✅ AUTO-REFRESH SETIAP 5 MENIT (300 DETIK)
+    setInterval(connectGS, 300000);
   } else {
     const notice = document.getElementById('setup-notice');
     if (notice) notice.style.display = 'flex';
@@ -1107,7 +1107,8 @@ function renderLaporan() {
 function renderMcu() {
   const el = document.getElementById('main');
   const mcuData = S.data.mcu || {};
-  const months  = Object.keys(mcuData);
+  const bulanOrder = ['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
+  const months  = Object.keys(mcuData).sort((a,b) => bulanOrder.indexOf(a) - bulanOrder.indexOf(b));
   const mn      = S.mcuMonth || months[months.length-1];
   const rows    = (mcuData[mn] || []).filter(r => r.omzet > 0);
 
@@ -1139,7 +1140,12 @@ function renderMcu() {
   const fmtFull = v => 'Rp ' + Math.round(v).toLocaleString('id-ID');
 
   const DAYS = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
-  const MONTH_IDX = {JAN:0,FEB:1,MAR:2,APR:3,MEI:4,JUN:5,JUL:6,AGS:7,SEP:8,OKT:9,NOV:10,DES:11};
+  const MONTH_IDX = {
+    // Singkat (legacy)
+    JAN:0,FEB:1,MAR:2,APR:3,MEI:4,JUN:5,JUL:6,AGS:7,SEP:8,OKT:9,NOV:10,DES:11,
+    // Lengkap (baru)
+    JANUARI:0,FEBRUARI:1,MARET:2,APRIL:3,MEI:4,JUNI:5,JULI:6,AGUSTUS:7,SEPTEMBER:8,OKTOBER:9,NOVEMBER:10,DESEMBER:11
+  };
   const mIdx = MONTH_IDX[mn] ?? 0;
   const getDow = d => { const dt = new Date(2026, mIdx, d); return DAYS[dt.getDay()]; };
 
