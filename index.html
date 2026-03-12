@@ -504,6 +504,8 @@ const S = {
 window.onload = () => {
   if (GS_URL.trim()) {
     connectGS(); // fetchKumulatif dipanggil otomatis di dalam connectGS
+    // ✅ AUTO-REFRESH SETIAP 60 DETIK
+    setInterval(connectGS, 60000);
   } else {
     const notice = document.getElementById('setup-notice');
     if (notice) notice.style.display = 'flex';
