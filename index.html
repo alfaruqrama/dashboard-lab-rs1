@@ -576,8 +576,8 @@ const S = {
 window.onload = () => {
   if (GS_URL.trim()) {
     connectGS(); // fetchKumulatif dipanggil otomatis di dalam connectGS
-    // ✅ AUTO-REFRESH SETIAP 5 MENIT (300 DETIK)
-    setInterval(connectGS, 300000);
+    // ✅ AUTO-REFRESH SETIAP 15 MENIT (900 DETIK)
+    setInterval(connectGS, 900000);
   } else {
     const notice = document.getElementById('setup-notice');
     if (notice) notice.style.display = 'flex';
@@ -1403,7 +1403,7 @@ const PAYERS = [
   {k:'petrokimia', l:'PT Petrokimia',   c:'#e11d48'},
   {k:'perusahaan', l:'Perusahaan Lain', c:'#3b82f6'},
   {k:'bri',        l:'BRI (PG)',        c:'#f59e0b'},
-  {k:'asuransi',   l:'Asuransi Kom.',   c:'#8b5cf6'},
+  {k:'asuransi',   l:'Asuransi Lain',   c:'#8b5cf6'},
   {k:'prokMurni',  l:'Prokespen Murni', c:'#06b6d4'},
   {k:'prokBpjs',   l:'Prokespen BPJS',  c:'#10b981'},
   {k:'bpjsKes',    l:'BPJS Kesehatan',  c:'#0a9e87'},
