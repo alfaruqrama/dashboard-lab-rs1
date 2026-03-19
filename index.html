@@ -426,7 +426,6 @@ const S = {
   data: { omzet: {}, kunjungan: {}, mcu: {} },
   tab: 'omzet',
   month: 'JANUARI',
-  mcuMonth: 'JANUARI',
   charts: {},
   live: false,
   kumulatifLoaded: false,
@@ -794,28 +793,29 @@ function buildTabs() {
   const omzetMs = sortBulan(Object.keys(S.data.omzet));
   const kunjMs = sortBulan(Object.keys(S.data.kunjungan));
   const mcuMs = sortBulan(Object.keys(S.data.mcu || {}));
+  
+  // ✅ Gabung semua bulan yang tersedia
+  const allMonths = Array.from(new Set([...omzetMs, ...kunjMs, ...mcuMs])).sort((a,b) => bulanOrder.indexOf(a) - bulanOrder.indexOf(b));
+  
+  // ✅ Gunakan S.month untuk semua tab (tidak perlu S.mcuMonth lagi)
+  const currentMonth = S.month;
 
-  const activeMsList = S.tab === 'mcu' ? mcuMs : (S.tab === 'kunjungan' ? kunjMs : omzetMs);
-  const activeMonth = S.tab === 'mcu' ? S.mcuMonth : S.month;
-  const onchangeFn = S.tab === 'mcu'
-    ? `onchange="setMcuMonth(this.value)"`
-    : `onchange="setMonth('${S.tab}',this.value)"`;
-
-  const monthDropdown = activeMsList.length > 0 && S.tab !== 'laporan'
-    ? `<select class="month-select" ${onchangeFn} title="Pilih bulan">
-        ${activeMsList.map(m => `<option value="${m}" ${activeMonth===m?'selected':''}>${m}</option>`).join('')}
+  const monthDropdown = allMonths.length > 0
+    ? `<select class="month-select" onchange="setMonth(this.value)" title="Pilih bulan">
+        ${allMonths.map(m => `<option value="${m}" ${currentMonth===m?'selected':''}>${m}</option>`).join('')}
        </select>`
     : '';
 
   let h = '';
+  // ✅ Dropdown paling kiri
+  if (monthDropdown) h += monthDropdown;
+  h += '<div class="tab-divider"></div>';
+  
   h += `<button class="tab ${S.tab==='omzet'?'active':''}" onclick="setTab('omzet')">💰 Omzet</button>`;
-  if (S.tab === 'omzet' && monthDropdown) h += monthDropdown;
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='kunjungan'?'active':''}" onclick="setTab('kunjungan')">👥 Kunjungan</button>`;
-  if (S.tab === 'kunjungan' && monthDropdown) h += monthDropdown;
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 Omzet MCU</button>`;
-  if (S.tab === 'mcu' && monthDropdown) h += monthDropdown;
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='laporan'?'active':''}" onclick="setTab('laporan')">📋 Laporan Harian</button>`;
   el.innerHTML = h;
@@ -823,21 +823,13 @@ function buildTabs() {
 
 function setTab(t) {
   S.tab = t;
-  const bulanOrder = ['JANUARI','FEBRUARI','MARET','APRIL','MEI','JUNI','JULI','AGUSTUS','SEPTEMBER','OKTOBER','NOVEMBER','DESEMBER'];
-  const sortBulan = (arr) => arr.sort((a,b) => bulanOrder.indexOf(a) - bulanOrder.indexOf(b));
-  
-  if (t === 'omzet' || t === 'kunjungan') {
-    const ms = sortBulan(Object.keys(S.data[t]));
-    if (!ms.includes(S.month)) S.month = ms[ms.length-1];
-  } else if (t === 'mcu') {
-    const ms = sortBulan(Object.keys(S.data.mcu || {}));
-    if (!ms.includes(S.mcuMonth)) S.mcuMonth = ms[ms.length-1];
-  }
   render();
 }
 
-function setMcuMonth(m) { S.tab = 'mcu'; S.mcuMonth = m; render(); }
-function setMonth(t, m) { S.tab = t; S.month = m; render(); }
+function setMonth(m) { 
+  S.month = m; 
+  render(); 
+}
 
 // ══════════════════════════════════════════════════════════════════
 // 8. INITIALIZATION
