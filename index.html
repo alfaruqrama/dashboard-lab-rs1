@@ -530,7 +530,7 @@ main{max-width:1400px;margin:0 auto;padding:10px 15px 60px}
 .sv{font-size:15px;font-weight:600;font-family:var(--mono);letter-spacing:-.02em}
 .sv.g{color:var(--acc)}
 
-.kh-wrap .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:12px}
+.kh-wrap .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:visible;margin-bottom:12px}
 .ch{padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafafa}
 .ct{font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px}
 .rc{font-size:9.5px;font-family:var(--mono);color:var(--muted)}
@@ -596,7 +596,7 @@ tbody td.tdn{font-family:var(--mono);font-size:9px;color:var(--muted);width:26px
 .bdel{width:18px;height:18px;border:1px solid var(--border);background:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 .bdel:hover{border-color:var(--danger);color:var(--danger);background:var(--dl)}
 
-.acl{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;z-index:999;display:none;font-size:10.5px}
+.acl{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.15);max-height:200px;overflow-y:auto;z-index:9000;display:none;font-size:11px}
 .aci{padding:5px 10px;cursor:pointer;border-bottom:1px solid var(--border)}
 .aci:hover,.aci.active{background:var(--acl);color:var(--acc)}
 
@@ -2049,7 +2049,7 @@ function showAC(inp,row,type,force=false){
   else if (force) { matches = PL.slice(0, 10); }
   else { hideAC(); return; }
   const list=document.getElementById('acl'); const rect=inp.getBoundingClientRect();
-  list.style.top=(rect.bottom+window.scrollY+1)+'px'; list.style.left=rect.left+'px'; list.style.width=Math.max(rect.width,220)+'px'; list.style.display='block'; list.innerHTML='';
+  list.style.top=(rect.bottom+1)+'px'; list.style.left=rect.left+'px'; list.style.width=Math.max(rect.width,220)+'px'; list.style.display='block'; list.innerHTML='';
   ACS={inp,row,type,matches,idx:-1};
   if(!matches.length){list.innerHTML='<div style="padding:5px 10px;color:var(--danger)">✕ Tidak ada</div>'; return;}
   matches.forEach((m,i)=>{const d=document.createElement('div'); d.className='aci'; d.textContent=m; d.onmousedown=()=>selAC(i); list.appendChild(d);});
