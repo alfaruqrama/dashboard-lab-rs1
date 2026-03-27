@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Kunjungan Lab RS Petrokimia Gresik</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&family=Fraunces:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -492,6 +493,130 @@ tbody td:first-child { text-align: center; font-weight: 700; color: var(--ac); }
   .fgrid,.fgrid3 { grid-template-columns:1fr; }
   .form-wrap { padding:16px 16px 60px; }
 }
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f5f3;--surface:#fff;--border:#e2e2de;--bs:#c4c4be;
+  --text:#181816;--muted:#88887f;--acc:#1a6b45;--acl:#edf7f2;--acm:#4caf80;
+  --danger:#c0392b;--dl:#fdf3f2;--warn:#d97706;--wl:#fffbf0;
+  --mono:'DM Mono',monospace;--sans:'Sora',sans-serif;
+  --r:6px;--sh:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;height:40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.hd-l{display:flex;align-items:center;gap:8px}
+.logo{width:22px;height:22px;background:var(--acc);border-radius:4px;display:flex;align-items:center;justify-content:center}
+.logo svg{width:12px;height:12px;fill:white}
+.hn{font-size:11.5px;font-weight:600;letter-spacing:-.01em}
+.hs{font-size:9.5px;color:var(--muted);font-family:var(--mono)}
+.hd-r{display:flex;align-items:center;gap:6px}
+.bdg{font-size:9.5px;font-family:var(--mono);color:var(--muted);background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:20px}
+.bexp{display:flex;align-items:center;gap:4px;padding:3px 10px;background:var(--acc);color:white;border:none;border-radius:4px;font-size:10.5px;font-weight:500;font-family:var(--sans);cursor:pointer;transition:background .15s}
+.bexp:hover{background:#145535}
+.bexp svg{width:12px;height:12px;fill:white}
+
+main{max-width:1400px;margin:0 auto;padding:10px 15px 60px}
+
+.meta{display:inline-grid;grid-template-columns:140px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:6px 12px;margin-bottom:10px;box-shadow:var(--sh)}
+.fg{display:flex;flex-direction:column;gap:2px}
+.fl{font-size:8.5px;font-weight:600;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em}
+.fi{padding:4px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:var(--sans);color:var(--text);background:var(--surface);outline:none;height:28px}
+.fi:focus{border-color:var(--acc)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:6px 10px;box-shadow:var(--sh)}
+.sl{font-size:8.5px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.sv{font-size:15px;font-weight:600;font-family:var(--mono);letter-spacing:-.02em}
+.sv.g{color:var(--acc)}
+
+.kh-wrap .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:12px}
+.ch{padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#fafafa}
+.ct{font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px}
+.rc{font-size:9.5px;font-family:var(--mono);color:var(--muted)}
+.tw{overflow-x:auto}
+
+table{width:100%;border-collapse:collapse;font-size:10.5px}
+thead th{background:var(--bg);padding:4px 6px;font-size:8.5px;font-family:var(--mono);font-weight:500;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.03em;text-align:center}
+thead th.thl{text-align:left}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:#f9f9f7}
+tbody td{padding:2px 4px;vertical-align:middle;text-align:center}
+tbody td.tdl{text-align:left}
+tbody td.tdn{font-family:var(--mono);font-size:9px;color:var(--muted);width:26px}
+
+.pw{position:relative;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.tpi{flex:1;padding:2px 5px;border:1px solid transparent;border-radius:4px;font-size:10.5px;font-family:var(--sans);color:var(--text);background:transparent;outline:none;min-width:180px;transition:all .15s}
+.tpi:focus{border-color:var(--acc);background:var(--acl)}
+.tpi.fx{font-weight:500;cursor:default}
+.tpi.inv{border-color:var(--danger)!important;background:var(--dl)!important;color:var(--danger)}
+
+.kb{font-size:8px;padding:1px 4px;border-radius:3px;font-family:var(--mono);font-weight:600;background:#e8e8e4;color:#666660}
+.kb.pg{background:#dbeafe;color:#1d4ed8}
+.kb.bpjs{background:#dcfce7;color:#166534}
+.kb.bri-life-pg{background:#fee2e2;color:#991b1b}
+.kb.prokespen{background:#ede9fe;color:#5b21b6}
+.kb.prokespen-bpjs{background:#d9f99d;color:#3a5c00}
+.kb.umum{background:#fef3c7;color:#b45309}
+.kb.tunai{background:#fef3c7;color:#b45309}
+.kb.jkk{background:#fce7f3;color:#9d174d}
+.kb.npg{background:#ffedd5;color:#c2410c}
+.kb.as{background:#e0e7ff;color:#4338ca}
+
+.tnum, .tcur { -moz-appearance: textfield; }
+.tnum::-webkit-outer-spin-button, .tnum::-webkit-inner-spin-button,
+.tcur::-webkit-outer-spin-button, .tcur::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.tnum{width:44px;padding:2px 3px;font-size:10.5px;border-radius:4px;background:transparent;border:1px solid transparent;text-align:center;font-family:var(--mono);outline:none}
+.tnum:focus{border-color:var(--acc);background:var(--acl)}
+.tcur{width:75px;padding:2px 3px;font-size:10.5px;text-align:right;font-family:var(--mono);border:1px solid transparent;background:transparent;outline:none}
+.tcur:focus{border-color:var(--acc);background:var(--acl)}
+
+.ttot{font-family:var(--mono);font-weight:600;font-size:11px;color:var(--acc)}
+.ttidr{font-family:var(--mono);font-weight:600;font-size:10.5px;color:var(--acc);text-align:right}
+
+.mcu-col{background:#f0fdf6}
+.mcu-val{font-size:11px;font-weight:600;color:var(--acc);font-family:var(--mono)}
+.mcu-auto{font-size:8px;color:var(--acc);opacity:.6;font-family:var(--mono)}
+.mcu-linked{font-size:8px;color:var(--acc);background:var(--acl);border:1px solid var(--acm);padding:1px 4px;border-radius:3px}
+
+.addb{padding:6px 12px;border-top:1px solid var(--border);display:flex;gap:8px}
+.badd{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1.2px dashed var(--bs);border-radius:4px;background:none;color:var(--muted);font-size:10px;cursor:pointer;outline:none}
+.badd:hover{border-color:var(--acc);color:var(--acc);background:var(--acl)}
+.badd-penjamin{display:flex;align-items:center;gap:4px;padding:4px 12px;border:1.2px solid var(--acc);border-radius:4px;background:var(--acl);color:var(--acc);font-size:10px;font-weight:500;cursor:pointer;margin-left:auto}
+
+.actb{display:flex;gap:8px;padding:10px 12px;background:var(--bg);border-top:1px solid var(--border)}
+.bpri{padding:6px 14px;background:var(--acc);color:white;border:none;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer}
+.bsec{padding:6px 12px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:11px;cursor:pointer}
+
+.sdiv{display:flex;align-items:center;gap:10px;margin:12px 0 8px}
+.sdiv span{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.sdiv::before,.sdiv::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.bdel{width:18px;height:18px;border:1px solid var(--border);background:none;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.bdel:hover{border-color:var(--danger);color:var(--danger);background:var(--dl)}
+
+.acl{position:fixed;background:var(--surface);border:1px solid var(--border);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-height:180px;overflow-y:auto;z-index:999;display:none;font-size:10.5px}
+.aci{padding:5px 10px;cursor:pointer;border-bottom:1px solid var(--border)}
+.aci:hover,.aci.active{background:var(--acl);color:var(--acc)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:var(--surface);border-radius:8px;padding:18px;width:360px;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+.modal-title{font-size:13px;font-weight:600;margin-bottom:12px}
+.label-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.label-opt{padding:8px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;text-align:center;font-size:10.5px}
+.label-opt.sel{border-color:var(--acc);background:var(--acl)}
+
+.kh-toast{position:fixed;bottom:20px;right:20px;background:#1a1a18;color:white;font-size:11px;padding:10px 16px;border-radius:4px;display:flex;align-items:center;gap:8px;opacity:0;transition:all .25s;z-index:9999}
+.kh-toast.show{opacity:1}
+.kh-toast.warn{background:var(--warn)}
+
+/* ── KUNJUNGAN HARIAN FORM ── */
+.kh-wrap .card{margin-bottom:12px}
+.kh-toast{position:fixed;bottom:20px;right:20px;background:#1a1a18;color:white;font-size:11px;padding:10px 16px;border-radius:4px;display:flex;align-items:center;gap:8px;opacity:0;transition:all .25s;z-index:9999;pointer-events:none}
+.kh-toast.show{opacity:1}
+.kh-toast.warn{background:var(--warn)}
 </style>
 </head>
 <body>
@@ -1335,6 +1460,7 @@ function render() {
   if (S.tab === 'omzet') renderOmzet();
   else if (S.tab === 'kunjungan') renderKunjungan();
   else if (S.tab === 'mcu') renderMcu();
+  else if (S.tab === 'kunjHarian') renderKunjHarian();
   else renderLaporan();
 }
 
@@ -1372,6 +1498,8 @@ function buildTabs() {
   h += `<button class="tab ${S.tab==='mcu'?'active':''}" onclick="setTab('mcu')">🔬 Omzet MCU</button>`;
   h += '<div class="tab-divider"></div>';
   h += `<button class="tab ${S.tab==='laporan'?'active':''}" onclick="setTab('laporan')">📋 Laporan Harian</button>`;
+  h += '<div class="tab-divider"></div>';
+  h += `<button class="tab ${S.tab==='kunjHarian'?'active':''}" onclick="setTab('kunjHarian')">📝 Input Kunjungan</button>`;
   el.innerHTML = h;
 }
 
@@ -1387,6 +1515,7 @@ function setTab(t) {
     const ms = sortBulan(Object.keys(S.data.mcu || {}));
     if (!ms.includes(S.mcuMonth)) S.mcuMonth = ms[ms.length-1];
   }
+  if (t !== 'kunjHarian') window._khLoaded = false; // reset agar autocomplete fresh
   render();
 }
 function setMcuMonth(m) { S.tab = 'mcu'; S.mcuMonth = m; render(); }
@@ -1711,6 +1840,577 @@ function renderKunjungan() {
       }}
   });
 }
+
+
+const FALLBACK_PL=["ABHITECH","ABITECH","ABYAKTA NASTARI TRANSINDO, PT","ACROSS ASIA ASSIST","ADHI KARYA (PERSERO), PT","ADINATA GRAHA SOLUSI, PT","ADIRA DINAMIKA MEDICILIN (ADMEDIKA)","ADMEDIKA (BCA)","ADMEDIKA - INHEALTH MANDIRI","ADMEDIKA HEALTHCARE SOLUTION","ADMINISTRASI ADMEDIKA, PT","ADVANTIS AKAZA INDONESIA, PT","AHMAD PUTRA INDO KARYA, PT","AIA ADMEDIKA","AIA FINANCIAL","AJ INHEALTH","AKSES TELKO MEDIKA (PT TELKOM AKSES)","ALBEA RIGID PACKAGING SURABAYA","ANEKA JASA GRHADIKA, PT","ANGSA EMAS PERDANA, PT","ANTIGEN MCU","ANTIGEN PASIEN","ANTIGEN PG","APLIKANUSA LINTASARTA, PT","ASKRIDA (ADMEDIKA)","ASTRA AVIVA LIFE, PT","ASTRA GRAPHIA, PT","ASURANSI ACA (ADMEDIKA)","ASURANSI ADIRA MEDICILLIN - JSMART","ASURANSI ADMEDIKA","ASURANSI ADMEDIKA ( PT. BANK CENTRAL ASIA)","ASURANSI AJ SEQUIS LIFE","ASURANSI ALLIANZ ADMEDIKA","ASURANSI ASTRA BUANA, PT","ASURANSI AXA INDONESIA (ADMEDIKA), PT","ASURANSI BINA DANA ARTHA, PT","ASURANSI BRI LIFE, PT","ASURANSI BUMIDA (ADMEDIKA)","ASURANSI CAKRAWALA PROTEKSI, PT (ADMEDIKA)","ASURANSI CIPUTRA INDONESIA (ADMEDIKA), PT","ASURANSI FWD (FULLERTON)","ASURANSI GARDA MEDIKA (ADMEDIKA)","ASURANSI INHEALTH (ADMEDIKA)","ASURANSI INTRA ASIA (ADMEDIKA)","ASURANSI JIWA ASTRA","ASURANSI JIWA MANULIFE","ASURANSI JIWA MANULIFE INDONESIA, PT (ADMEDIKA)","ASURANSI JIWA RECAPITAL, PT (ADMEDIKA)","ASURANSI JMA SYARIAH (ADMEDIKA)","ASURANSI KSK INSURANCE INDONESIA","ASURANSI MEGA HEALTH, PT (ADMEDIKA)","ASURANSI MEGA LIFE","ASURANSI RAMA (ADMEDIKA)","ASURANSI RAMAYANA","ASURANSI SINAR MAS, PT (ADMEDIKA)","ASURANSI TAKAFUL KELUARGA (ADMEDIKA)","ASURANSI TAKAFUL KELUARGA, PT","ASURANSI TIRTA MEDICAL CENTER","ATAMORA","AVRIST ADMEDIKA","AXA INSURANCE INDONESIA, PT","AXA MANDIRI (ADMEDIKA)","BABCOCK & WILCOX, PT","BAHAGIA SEJAHTERA BERSAMA, PT","BANIQL TEKNOLOGI INDONESIA, PT","BANK RAKYAT INDONESIA","BANK SYARIAH INDONESIA, PT","BANK TABUNGAN NEGARA (BTN)","BATARA ELOK SEMESTA TERPADU, PT","BATARA ELOK SEMESTA TERPADU, PT (BEST)","BCA LIFE","BERMAKS INDONESIA, PT","BIMA ASRI INTERMITRA, PT","BIRAWIDHA GARDA SANTOSA, PT","BNI LIFE INSURANCE (ADMEDIKA)","BNI LIFE INSURANCE, PT","BNI LIFE SYARIAH (ADMEDIKA)","BNI LIFE TELKOMSEL (ADMEDIKA)","BOSOWA ASURANSI (ADMEDIKA)","BPJS KESEHATAN","BPJS KESEHATAN - KAPITASI","BPJS NAIK KELAS.","CALON FOKUS JASA MITRA, PT (FJM)","CALON INDOSPRING","CALON KARYAWAN PT PGM","CALON KAYAKU","CALON LIWAYWAY","CALON PETRO OXO","CALON PJA","CAR LIFE INSURANCE (ADMEDIKA)","CARGILL INDONESIA, PT","COB BPJS KESEHATAN","DAVKO MEGAH CORPORINDO, PT","DIRTAJAYA","DPB PETROKIMIA KAYAKU","DSV SOLUTIONS INDONESIA, PT","DUNIA KIMIA JAYA, PT","EDBERS NUSANTARA, PT","EKA BINTANG PERKASA, PT","ELIN JAYA","EQUITY LIFE INDONESIA, PT","EQUITY LIFE INDONESIA, PT (ADMEDIKA)","FOKUS JASA MITRA, PT (FJM)","FWD LIFE INDONESIA","GENERALI INDONESIA LIFE (ADMEDIKA)","GLOBAL ASST. & HEALTHCARE, PT","GREAT EASTERN (ADMEDIKA)","GRESIK CIPTA SEJAHTERA, PT","GRESIK POWER INDONESIA, PT","HANWHA LIFE","HANWHA LIFE (ADMEDIKA)","HARTA GENERAL INSURANCE, PT","HIKARI","HIKARI TEKNOLOGI INDONESIA","HM. SAMPOERNA, PT","IKPT GRESIK, PT","INHEALTH INDEMITY","INTECS TEKNIKATAMA INDUSTRI, PT","INTEGRITAS SOLUSI MEDIKA, PT (ISOMEDIK)","INTERNASIONAL SOS (ASIH EKA ABADI, PT) (ISOS)","INTERNATIONAL PACIFIC CROSS (ADMEDIKA)","JASA RAHARJA, PT","JASINDO HEALTHCARE","JINDAL STAINLES INDONESIA, PT","K3PG","KARTIKA BINA MEDIKATAMA, PT","KARYAWAN PG","KARYAWAN PG INHEALTH","KAWASAN INDUSTRI GRESIK, PT","KELUARGA PG","KELUARGA PG INHEALTH","KLUB RENANG PETROKIMIA GRESIK","KOPERASI KONSUMEN KLG PG (K3PG)","KOPERASI WARGA SEMEN GRESIK (KWSG)","KOPINDO CIPTA SEJAHTERA","KRAKATAU MEDIKA, PT","KWSG","LAUTAN AIR INDONESIA, PT","LERINDRO INTERNATIONAL, PT","LIKU TELAGA, PT","LINDE INDONESIA, PT","LIPPO LIFE ASSURANCE, PT (MEDITAP)","MAGNA SEHAT ADMEDIKA","MCU CALON JAMAAH HAJI","MCU UMUM","MEDIA DOKTER INVESTAMA, PT","MEGA INSURANCE (Fullerton)","MNC LIFE","MSIG LIFE INSURANCE INDONESIA Tbk (ADMEDIKA), PT","MUCOINDO","NAYAKA","NETMARKS INDONESIA, PT","NIPSEA PAINT AND CHEMICALS (NIPPON PAINT), PT","OONA INSURANCE","OWLEXA","PAKET BASIC PEKERJA (UMUM)","PAKET IGE ATOPY","PAKET MCU SAPI (UMUM)","PAKET MERAH (UMUM)","PAKET MERAH PUTIH (UMUM)","PAKET MINI MCU (UMUM)","PAKET NARKOBA (UMUM)","PAKET PAHLAWAN (UMUM)","PAKET PEJUANG (UMUM)","PAKET PRE MARITAL GOLD","PAKET PRE MARITAL SILVER","PAKET PUTIH (UMUM)","PAKET SAHABAT DIABETES (UMUM)","PAKET SAHABAT GINJAL (UMUM)","PAKET SAHABAT HATI (UMUM)","PAKET SAHABAT JANTUNG BASIC (UMUM)","PAKET SAHABAT JANTUNG PREM (UMUM)","PAKET SCREENING A (UMUM)","PAKET SCREENING B (UMUM)","PAKET SCREENING C (UMUM)","PAKET SCREENING D (UMUM)","PAKET SCREENING E (UMUM)","PAKET SEGAR BUGAR","PAKET SEHAT BUGAR","PAMA PERSADA","PANGANSARI UTAMA, PT","PARNA MASPION SEJAHTERA, PT","PASIEN UMUM","PELINDO","PELINDO, PT","PERTAMEDIKA","PERTAMINA (ADMEDIKA)","PERTAMINA, PT","PETRO GRAHA MEDIKA (RSPG)(PGM), PT","PETRO JORDAN ABADI,PT (PJA)","PETRO KARYA MANDIRI, PT","PETRO OXO NUSANTARA, PT","PETROCENTRAL, PT","PETROKAYAKU, PT","PETROKIMIA GRESIK, PT","PETROKIMIA KAYAKU, PT","PETROKOPINDO CIPTA SELARAS, PT (PCS)","PETRONIKA, PT","PETROSIDA, PT","PETROWIDADA, PT","PGN SAKA, PT","PLN INSURANCE, PT","PLN NUSANTARA, PT","PROKESPEN BPJS COB","PROKESPEN MURNI","PRUDENTIAL SHARIA LIFE ASSURANCE , PT","PT ADHI KARYA (PERSERO) TBK","PT PRUDENTIAL LIFE ASSURANCE (ADMEDIKA)","PT PUPUK INDONESIA","PT WIJAYA KARYA Tbk (WIKA)","PUPUK INDONESIA, PT","RELIANCE INSURANCE, PT (ADMEDIKA)","RS PUPUK KALTIM BONTANG","SEMEN INDONESIA DISTRIBUTOR","SMELTING, PT","SOLVAY MANYAR, PT","SOMPO (ADMEDIKA)","SUNDAY INSURANCE","VALE ADMEDIKA","WASA MITRA ENGINEERING, PT","WASKITA, PT","WILMAR NABATI INDONESIA, PT","YAYASAN KESEHATAN PEGAWAI TELKOM, PT","YAYASAN KESEHATAN PERTAMINA","YAYASAN PETROKIMIA GRESIK"];
+const FX=[
+  {k:'PG',          j:'KARYAWAN PG'},
+  {k:'PG',          j:'KELUARGA PG'},
+  {k:'BRI LIFE PG', j:'KARYAWAN PG BRI LIFE'},
+  {k:'BRI LIFE PG', j:'KELUARGA PG BRI LIFE'},
+  {k:'PROKESPEN',   j:'PROKESPEN MURNI'},
+  {k:'PROKESPEN BPJS', j:'PROKESPEN BPJS COB'},
+  {k:'BPJS',        j:'BPJS KESEHATAN'},
+  {k:'BPJS',        j:'BPJS NAIK KELAS.'},
+  {k:'UMUM',        j:'PASIEN UMUM'},
+  {k:'JKK',         j:'BPJS KETENAGAKERJAAN (JKK)'},
+  {k:'NPG',         j:'COB BPJS KESEHATAN'},
+];
+const KC=['rj','ri','igd','mcu','promo','dokter','exc','prior','grj','gri','sat','ppk'];
+const LOC_MAP={'rj':'A. Yani (Rawat Jalan)','ri':'A. Yani (Rawat Inap)','igd':'IGD','mcu':'MCU','promo':'Paket Promo','dokter':'Dokter Luar','exc':'Poli Exc','prior':'Poli Prior','grj':'Grahu (Rawat Jalan)','gri':'Grahu (Rawat Inap)','sat':'Satelit','ppk':'PPK1'};
+
+let KR=[],MR=[],ACS=null,modalLabel=null;
+
+// form onload removed — init via renderKunjHarian()
+
+function uid(){return Date.now()+Math.random();}
+function nkr(j='',k='',fx=false){const r={id:uid(),j,k,fx,ok:fx};KC.forEach(c=>r[c]='');return r;}
+function nmr(lbl=''){return{id:uid(),p:'',k:lbl,ok:false,n:'',nom:'',kp:''};}
+
+function syncMCU(){
+  const mcuMap={};
+  MR.forEach(r=>{if(!r.p)return; const key=r.p.toUpperCase(); mcuMap[key]=(mcuMap[key]||0)+(parseInt(r.n)||0);});
+  KR.forEach(row=>{
+    const key=row.j.toUpperCase();
+    if(mcuMap[key]!==undefined){ row.mcu=mcuMap[key]; row.mcuLinked=true; }
+    else if(row.mcuLinked){ row.mcu=0; row.mcuLinked=false; }
+  });
+}
+
+function rK(){
+  const tb=document.getElementById('bK'); if(!tb)return; tb.innerHTML='';
+  KR.forEach((row,i)=>{
+    const tr=document.createElement('tr');
+    if(!row.fx && !row.ok && row.j) tr.classList.add('err');
+    if(row.mcuLinked) tr.classList.add('linked');
+    mkTd(tr,i+1,'tdn');
+    const tdp=document.createElement('td'); tdp.className='tdl';
+    const w=document.createElement('div'); w.className='pw';
+    if(row.fx){
+      const inp=mki('tpi fx',row.j,true); w.appendChild(inp);
+      if(row.k){const b=document.createElement('span'); b.className='kb '+row.k.toLowerCase().replace(/\s+/g,'-'); b.textContent=row.k; w.appendChild(b);}
+    } else {
+      const inp=mki('tpi'+(row.j&&!row.ok?' inv':''),row.j); inp.placeholder='Nama...';
+      if(row.k){const b=document.createElement('span'); b.className='kb '+row.k.toLowerCase().replace(/\s+/g,'-'); b.textContent=row.k; w.appendChild(b);}
+      inp.oninput=e=>{row.j=e.target.value; showAC(inp,row,'k'); sv();};
+      inp.onchange=e=>{row.j=e.target.value; row.ok=PS.has(e.target.value.trim().toUpperCase())||!e.target.value.trim(); syncMCU(); rK(); sv();};
+      inp.onkeydown=handleKey; 
+      inp.onblur=()=>setTimeout(hideAC,180);
+      inp.onfocus=()=> { if(row.j.length < 2) showAC(inp,row,'k',true); };
+      w.appendChild(inp);
+    }
+    tdp.appendChild(w); tr.appendChild(tdp);
+    KC.forEach(col=>{
+      const tdc=document.createElement('td');
+      if(col==='mcu'){
+        tdc.className='mcu-col'; const val=parseInt(row.mcu)||0;
+        tdc.innerHTML=val?`<span class="mcu-val">${val}</span><br><span class="mcu-auto">auto</span>`:'—';
+      } else {
+        const inp=document.createElement('input'); inp.type='number'; inp.className='tnum'; inp.value=row[col]||''; inp.placeholder='—';
+        if(!row.j){inp.disabled=true;inp.title='Isi nama penjamin dulu';inp.style.opacity='.3';inp.style.cursor='not-allowed';}
+        inp.oninput=e=>{
+          if(!row.j){e.target.value='';toast('Isi nama penjamin terlebih dahulu!','warn');return;}
+          let val = parseInt(e.target.value);
+          if (val < 0) { val = 0; e.target.value = 0; }
+          row[col]=e.target.value===''?'':(val || 0); 
+          const _kt=document.getElementById('kt'+row.id);if(_kt)_kt.textContent=krt(row)||'—'; updateStats(); sv();
+        };
+        inp.onkeydown=handleKey;
+        tdc.appendChild(inp);
+      }
+      tr.appendChild(tdc);
+    });
+    const ttd=document.createElement('td'); ttd.className='ttot'; ttd.id='kt'+row.id; ttd.textContent=krt(row)||'—'; tr.appendChild(ttd);
+    const dtd=document.createElement('td'); if(!row.fx) dtd.appendChild(delbtn(()=>{KR=KR.filter(r=>r.id!==row.id); syncMCU(); rK(); updateStats(); sv();}));
+    tr.appendChild(dtd); tb.appendChild(tr);
+  });
+  const tt=document.createElement('tr'); tt.className='total-row'; tt.innerHTML='<td></td><td class="tdl">TOTAL</td>';
+  let g=0; KC.forEach(col=>{const s=KR.reduce((a,r)=>a+(parseInt(r[col])||0),0); g+=s; tt.innerHTML+=`<td class="${col==='mcu'?'mcu-col ttot':'ttot'}">${s||'—'}</td>`;});
+  tt.innerHTML+=`<td class="ttot">${g||'—'}</td><td></td>`; tb.appendChild(tt);
+  const _rcK=document.getElementById('rcK');if(_rcK)_rcK.textContent=KR.length+' baris'; updateStats();
+}
+
+function rM(){
+  const tb=document.getElementById('bM'); if(!tb)return; tb.innerHTML='';
+  MR.forEach((row,i)=>{
+    const tr=document.createElement('tr');
+    mkTd(tr,i+1,'tdn');
+
+    // ── Perusahaan (same pattern as kunjungan: autocomplete from PL, strict) ──
+    const tdp=document.createElement('td'); tdp.className='tdl';
+    const w=document.createElement('div'); w.className='pw';
+
+    const inp=mki('tpi'+(row.p&&!row.ok?' inv':''),row.p);
+    inp.placeholder='Nama perusahaan...'; inp.autocomplete='off';
+
+    // Label badge
+    if(row.k){
+      const b=document.createElement('span');
+      b.className='kb '+row.k.toLowerCase().replace(/\s+/g,'-');
+      b.textContent=row.k; w.appendChild(b);
+    }
+
+    inp.oninput=e=>{
+      row.p=e.target.value;
+      inp.classList.remove('inv');
+      showAC(inp,row,'m'); sv();
+    };
+    inp.onchange=e=>{
+      row.p=e.target.value;
+      row.ok=PS.has(e.target.value.trim().toUpperCase())||!e.target.value.trim();
+      inp.classList.toggle('inv',row.p&&!row.ok);
+      // Auto-link: update or add row in KR
+      if(row.ok && row.p) autoLinkMCU(row);
+      syncMCU(); rK(); rM(); sv();
+    };
+    inp.onkeydown=handleKey;
+    inp.onblur=()=>setTimeout(hideAC,180);
+    inp.onfocus=()=>{ if(row.p.length<2) showAC(inp,row,'m',true); };
+    w.appendChild(inp); tdp.appendChild(w); tr.appendChild(tdp);
+
+    // ── Peserta ──────────────────────────────────────────────────────────────
+    const tp=document.createElement('td');
+    const ip=document.createElement('input'); ip.type='number'; ip.className='tnum'; ip.value=row.n||''; ip.placeholder='—';
+    if(!row.p){ip.disabled=true;ip.title='Isi nama perusahaan dulu';ip.style.opacity='.3';}
+    ip.oninput=e=>{
+      if(!row.p){e.target.value='';toast('Isi nama perusahaan terlebih dahulu!','warn');return;}
+      let val=parseInt(e.target.value); if(val<0){val=0;e.target.value=0;}
+      row.n=e.target.value===''?'':(val||0);
+      syncMCU(); rK();
+      const _mtp=document.getElementById('mt'+row.id); if(_mtp)_mtp.textContent=fIDR(mrt(row));
+      updateStats(); sv();
+    };
+    ip.onkeydown=handleKey; tp.appendChild(ip); tr.appendChild(tp);
+
+    // ── Nominal ──────────────────────────────────────────────────────────────
+    const tn=document.createElement('td');
+    const inm=document.createElement('input'); inm.type='number'; inm.className='tcur'; inm.value=row.nom||''; inm.placeholder='0';
+    if(!row.p){inm.disabled=true;inm.title='Isi nama perusahaan dulu';inm.style.opacity='.3';}
+    inm.oninput=e=>{
+      if(!row.p){e.target.value='';toast('Isi nama perusahaan terlebih dahulu!','warn');return;}
+      let val=parseInt(e.target.value); if(val<0){val=0;e.target.value=0;}
+      row.nom=e.target.value===''?'':(val||0);
+      const _mtn=document.getElementById('mt'+row.id); if(_mtn)_mtn.textContent=fIDR(mrt(row));
+      updateStats(); sv();
+    };
+    inm.onkeydown=handleKey; tn.appendChild(inm); tr.appendChild(tn);
+
+    // ── Total ────────────────────────────────────────────────────────────────
+    const tt=document.createElement('td'); tt.className='ttidr'; tt.id='mt'+row.id; tt.textContent=fIDR(mrt(row)); tr.appendChild(tt);
+
+    // ── Ket paket ────────────────────────────────────────────────────────────
+    const tk=document.createElement('td'); tk.className='tdl';
+    const ik=mki('tpi',row.kp); ik.placeholder='Paket...';
+    ik.oninput=e=>{row.kp=e.target.value;sv();}; ik.onkeydown=handleKey;
+    tk.appendChild(ik); tr.appendChild(tk);
+
+    // ── Link status ──────────────────────────────────────────────────────────
+    const tl=document.createElement('td');
+    if(row.ok&&row.p){
+      const linked=KR.some(r=>r.j&&r.j.toUpperCase()===row.p.toUpperCase());
+      tl.innerHTML=linked
+        ?'<span class="mcu-linked">✓ link</span>'
+        :'<span style="font-size:8px;color:var(--warn)">⚠ no</span>';
+    }
+    tr.appendChild(tl);
+
+    // ── Del ──────────────────────────────────────────────────────────────────
+    const dtd=document.createElement('td');
+    dtd.appendChild(delbtn(()=>{MR=MR.filter(r=>r.id!==row.id); syncMCU(); rK(); rM(); updateStats(); sv();}));
+    tr.appendChild(dtd); tb.appendChild(tr);
+  });
+  const _rcM=document.getElementById('rcM'); if(_rcM)_rcM.textContent=MR.length+' baris';
+  updateStats();
+}
+
+// Auto-link MCU row ke tabel kunjungan
+function autoLinkMCU(mcuRow){
+  const key=mcuRow.p.trim().toUpperCase();
+  const existing=KR.find(r=>r.j&&r.j.toUpperCase()===key);
+  if(existing){
+    // Update: MCU col di-sync via syncMCU() — sudah handled
+    return;
+  }
+  // Tambah baris baru di KR dengan label dari mcuRow atau default NPG
+  const newRow=nkr(mcuRow.p.trim(),mcuRow.k||'NPG',false);
+  newRow.ok=PS.has(key)||true; // custom entry boleh
+  KR.push(newRow);
+}
+
+
+function showAC(inp,row,type,force=false){
+  const q=inp.value.trim(); 
+  if(!force && q.length<2){hideAC(); return;}
+  let matches = [];
+  if (q.length >= 2) { matches = PL.filter(p=>p.toLowerCase().includes(q.toLowerCase())).slice(0,10); }
+  else if (force) { matches = PL.slice(0, 10); }
+  else { hideAC(); return; }
+  const list=document.getElementById('acl'); const rect=inp.getBoundingClientRect();
+  list.style.top=(rect.bottom+window.scrollY+1)+'px'; list.style.left=rect.left+'px'; list.style.width=Math.max(rect.width,220)+'px'; list.style.display='block'; list.innerHTML='';
+  ACS={inp,row,type,matches,idx:-1};
+  if(!matches.length){list.innerHTML='<div style="padding:5px 10px;color:var(--danger)">✕ Tidak ada</div>'; return;}
+  matches.forEach((m,i)=>{const d=document.createElement('div'); d.className='aci'; d.textContent=m; d.onmousedown=()=>selAC(i); list.appendChild(d);});
+}
+
+function hideAC(){document.getElementById('acl').style.display='none'; ACS=null;}
+document.addEventListener('click', e => { if(!e.target.closest('.pw') && !e.target.closest('#acl')) hideAC(); });
+function selAC(idx){
+  if(!ACS)return; const val=ACS.matches[idx]; ACS.inp.value=val;
+  if(ACS.type==='k'){
+    ACS.row.j=val; ACS.row.ok=true;
+  } else {
+    ACS.row.p=val; ACS.row.ok=true;
+    autoLinkMCU(ACS.row); // auto-link ke tabel kunjungan
+  }
+  hideAC(); syncMCU(); rK(); rM(); sv();
+}
+
+function handleKey(e){
+  // Jika Autocomplete sedang terbuka, gunakan logika navigasi autocomplete
+  if(ACS && ACS.matches.length > 0){
+    const items=document.querySelectorAll('.aci');
+    if(e.key==='ArrowDown'){e.preventDefault(); ACS.idx=Math.min(ACS.idx+1,items.length-1); items.forEach((el,i)=>el.classList.toggle('active',i===ACS.idx)); return;}
+    else if(e.key==='ArrowUp'){e.preventDefault(); ACS.idx=Math.max(ACS.idx-1,0); items.forEach((el,i)=>el.classList.toggle('active',i===ACS.idx)); return;}
+    else if(e.key==='Enter'&&ACS.idx>=0){e.preventDefault(); selAC(ACS.idx); return;}
+    else if(e.key==='Escape'){hideAC(); return;}
+  }
+
+  // Navigasi Grid antar Kotak Input
+  if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)){
+    e.preventDefault();
+    const cur = e.target;
+    const cell = cur.closest('td');
+    const row = cell.closest('tr');
+    const table = row.closest('table');
+    const colIdx = Array.from(row.cells).indexOf(cell);
+    const rowIdx = Array.from(table.rows).indexOf(row);
+
+    let target;
+    if(e.key === 'ArrowUp'){
+      const prevRow = table.rows[rowIdx - 1];
+      if(prevRow && prevRow.cells[colIdx]){ target = prevRow.cells[colIdx].querySelector('input'); }
+    } else if(e.key === 'ArrowDown'){
+      const nextRow = table.rows[rowIdx + 1];
+      if(nextRow && nextRow.cells[colIdx]){ target = nextRow.cells[colIdx].querySelector('input'); }
+    } else if(e.key === 'ArrowLeft'){
+      const prevCell = row.cells[colIdx - 1];
+      if(prevCell){ target = prevCell.querySelector('input'); }
+    } else if(e.key === 'ArrowRight'){
+      const nextCell = row.cells[colIdx + 1];
+      if(nextCell){ target = nextCell.querySelector('input'); }
+    }
+
+    if(target && target.tagName === 'INPUT' && !target.readOnly) {
+      target.focus();
+      // Untuk input teks, posisikan kursor di akhir
+      if(target.type === 'text') {
+        const len = target.value.length;
+        target.setSelectionRange(len, len);
+      }
+    }
+  }
+}
+
+function openAddPenjaminModal(){
+  modalLabel=null; document.getElementById('modalSearch').value=''; document.getElementById('mbtnAdd').disabled=true;
+  document.querySelectorAll('.label-opt').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
+function selectLabel(lbl){modalLabel=lbl; document.querySelectorAll('.label-opt').forEach(el=>el.classList.remove('sel')); document.getElementById('lopt-'+lbl.toLowerCase()).classList.add('sel'); checkModalReady();}
+function onModalSearch(){checkModalReady();}
+function checkModalReady(){const val=document.getElementById('modalSearch').value.trim(); document.getElementById('mbtnAdd').disabled=!(modalLabel&&val.length>=2);}
+function confirmAddPenjamin(){
+  const val=document.getElementById('modalSearch').value.trim();
+  const row=nkr(val,modalLabel,false); row.ok=true; KR.push(row); syncMCU(); rK(); closeModal(); sv();
+}
+
+function addFixed(){
+  const ex=new Set(KR.filter(r=>r.fx).map(r=>r.j)); FX.forEach(f=>{if(!ex.has(f.j))KR.push(nkr(f.j,f.k,true));});
+  syncMCU(); rK(); sv();
+}
+
+function addRow(t,lbl){
+  if(t==='k'){ 
+    if(!lbl){ document.getElementById('lpOverlay').classList.add('show'); return; } 
+    KR.push(nkr('',lbl,false)); rK(); 
+  }
+  else{ if(!lbl){ openMCULabelPicker(); return; } const r=nmr(lbl); MR.push(r); rM(); }
+  sv();
+}
+
+function confirmLP(lbl){ document.getElementById('lpOverlay').classList.remove('show'); addRow('k',lbl); }
+function closeLP(){document.getElementById('lpOverlay').classList.remove('show');}
+
+function clearAll(){if(confirm('Reset semua data?')){KR=[]; MR=[]; FX.forEach(f=>KR.push(nkr(f.j,f.k,true))); rK(); rM(); updateStats(); sv();}}
+function updateMeta(){const iDate=document.getElementById('iDate');if(!iDate)return;const d=iDate.value;if(d){const dt=new Date(d+'T00:00:00');const bdg=document.getElementById('bdg');if(bdg)bdg.textContent=dt.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short'});}}
+function updateStats(){
+  const tot=KR.reduce((a,r)=>a+krt(r),0);const rj=KR.reduce((a,r)=>a+(parseInt(r.rj)||0),0);const ri=KR.reduce((a,r)=>a+(parseInt(r.ri)||0),0);const mt=MR.reduce((a,r)=>a+mrt(r),0);
+  const _s=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  _s('sTot',tot.toLocaleString('id-ID'));_s('sRJ',rj.toLocaleString('id-ID'));_s('sRI',ri.toLocaleString('id-ID'));_s('sMCU',mt?fIDR(mt):'Rp 0');
+}
+
+// doExport v1 removed — replaced by color-coded version below
+
+function krt(r){return KC.reduce((a,c)=>a+(parseInt(r[c])||0),0);}
+function mrt(r){return(parseInt(r.n)||0)*(parseInt(r.nom)||0);}
+function fIDR(n){return n?'Rp '+n.toLocaleString('id-ID'):'—';}
+function mkTd(tr,v,cls){const td=document.createElement('td'); if(cls)td.className=cls; td.textContent=v; tr.appendChild(td);}
+function mki(cls,val='',ro=false){const i=document.createElement('input'); i.type='text'; i.className=cls; i.value=val; if(ro)i.readOnly=true; return i;}
+function delbtn(cb){const b=document.createElement('button'); b.className='bdel'; b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'; b.onclick=cb; return b;}
+function sv(){try{sessionStorage.setItem('k',JSON.stringify(KR)); sessionStorage.setItem('m',JSON.stringify(MR));}catch(e){}}
+function loadSess(){try{const k=sessionStorage.getItem('k'),m=sessionStorage.getItem('m'); if(k)KR=JSON.parse(k); if(m)MR=JSON.parse(m);}catch(e){}}
+function toast(msg,type='ok'){const t=document.getElementById('kh-tst');const tm=document.getElementById('tstMsg');if(!t||!tm)return;tm.textContent=msg;t.className='kh-toast show '+type;setTimeout(()=>{if(t)t.className='kh-toast';},3000);}
+
+// ── KUNJUNGAN HARIAN ─────────────────────────────────────────────────────────
+// GAS_URL_KH = sama dengan GS_URL dashboard (1 GAS untuk semua)
+// Jika GAS kunjungan terpisah, ganti nilainya
+let PL = [...FALLBACK_PL];
+let PS = new Set(PL.map(p => p.toUpperCase()));
+
+async function loadPenjamin() {
+  const ind = document.getElementById('ldInd');
+  try {
+    const url = GS_URL.trim();
+    if (!url) throw new Error('no url');
+    const r = await fetch(url + '?action=penjamin');
+    const json = await r.json();
+    if (json.status === 'ok' && json.data.length) {
+      PL = json.data.map(d => d.nama);
+      PS = new Set(PL.map(p => p.toUpperCase()));
+      if (ind) { ind.textContent = PL.length + ' penjamin ✓'; setTimeout(() => { if(ind) ind.style.display='none'; }, 2000); }
+      // Autocomplete list updated — rows sudah tampil, tidak perlu re-render
+    }
+  } catch(err) {
+    PL = [...FALLBACK_PL]; PS = new Set(PL.map(p => p.toUpperCase()));
+    if (ind) { ind.textContent = '⚠ offline'; ind.style.color = 'var(--warn)'; }
+  }
+}
+
+async function submitToSheets() {
+  const url = GS_URL.trim();
+  if (!url || url.includes('GANTI')) { toast('GAS_URL belum diisi!', 'warn'); return; }
+  const date = document.getElementById('iDate').value;
+  if (!date) { toast('Pilih tanggal dulu!', 'warn'); return; }
+  const kunjungan = [];
+  KR.forEach(r => {
+    if (!r.j) return;
+    KC.forEach(c => { const v = parseInt(r[c])||0; if(v>0) kunjungan.push({label:r.k||'',kategori:r.k||'',jaminan:r.j,lokasi:LOC_MAP[c],jumlah:v}); });
+  });
+  const mcu = MR.filter(r => r.p && (parseInt(r.n)||0) > 0).map(r => {
+    const kRow = KR.find(k => k.j && k.j.toUpperCase() === r.p.toUpperCase());
+    return { perusahaan:r.p, label:kRow?kRow.k||'':'', paket:r.kp||'', peserta:parseInt(r.n)||0, nominal:parseInt(r.nom)||0, total:mrt(r) };
+  });
+  const penjaminBaru = KR.filter(r => r.isNew && r.j).map(r => ({nama:r.j, label:r.k||''}));
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = 'Mengirim...';
+  try {
+    await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'submit', tanggal:date, kunjungan, mcu, penjaminBaru }),
+      mode: 'no-cors' });
+    KR.forEach(r => r.isNew = false);
+    toast('✓ Data terkirim ke Sheets!');
+  } catch(err) { toast('Gagal: ' + err.message, 'warn'); }
+  finally { btn.disabled = false; btn.textContent = 'Submit ke Sheets'; }
+}
+
+
+function renderKunjHarian() {
+  // Selalu pastikan penjamin tetap ada di KR
+  const fixedNames = new Set(FX.map(f => f.j));
+  FX.forEach(f => {
+    if (!KR.find(r => r.j === f.j && r.fx)) KR.push(nkr(f.j, f.k, true));
+  });
+
+  const el = document.getElementById('main');
+  el.innerHTML = '<div class="fadein kh-wrap">' + buildKHFormHTML() + '</div>';
+  document.getElementById('iDate').value = new Date().toISOString().split('T')[0];
+  updateMeta();
+
+  // Render baris tetap SEGERA — tidak perlu tunggu GAS
+  rK(); rM();
+
+  // Load autocomplete list dari GAS di background (tidak blocking)
+  if (!window._khLoaded) {
+    window._khLoaded = true;
+    loadPenjamin(); // tidak .then(rK) — FX sudah tampil, autocomplete update di background
+  }
+}
+
+function buildKHFormHTML() {
+  return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">' +
+    '<div style="display:flex;align-items:center;gap:10px">' +
+      '<div class="fg"><label class="fl">Tanggal</label><input type="date" class="fi" id="iDate" onchange="updateMeta()"></div>' +
+      '<span id="ldInd" style="font-size:9px;font-family:var(--mono);color:var(--ac)">loading...</span>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px">' +
+      '<button class="bexp" onclick="doExport()">' +
+        '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Excel' +
+      '</button>' +
+      '<button id="btnSubmit" onclick="submitToSheets()" style="display:flex;align-items:center;gap:4px;padding:3px 10px;background:#1a4e8a;color:white;border:none;border-radius:4px;font-size:10.5px;font-weight:500;cursor:pointer">Submit ke Sheets</button>' +
+    '</div>' +
+  '</div>' +
+  '<div class="stats" style="margin-bottom:12px">' +
+    '<div class="sc"><div class="sl">Total Kunjungan</div><div class="sv g" id="sTot">0</div></div>' +
+    '<div class="sc"><div class="sl">R. Jalan</div><div class="sv" id="sRJ">0</div></div>' +
+    '<div class="sc"><div class="sl">R. Inap</div><div class="sv" id="sRI">0</div></div>' +
+    '<div class="sc"><div class="sl">Total MCU</div><div class="sv g" id="sMCU">Rp 0</div></div>' +
+  '</div>' +
+  '<div class="card" style="margin-bottom:12px">' +
+    '<div class="ch"><div class="ct">Kunjungan per Penjamin</div><span class="rc" id="rcK">0 baris</span></div>' +
+    '<div class="tw"><table>' +
+      '<thead><tr>' +
+        '<th>#</th><th class="thl" style="min-width:200px">Nama Penjamin</th>' +
+        '<th>RJ<br>Yani</th><th>RI<br>Yani</th><th>IGD</th>' +
+        '<th style="background:#f0fdf6;color:#1a6b45">MCU<br>auto</th>' +
+        '<th>Promo</th><th>Dokter</th><th>Exc</th><th>Prior</th>' +
+        '<th>Grhu RJ</th><th>Grhu RI</th><th>Sat</th><th>PPK1</th><th>Total</th><th></th>' +
+      '</tr></thead>' +
+      '<tbody id="bK"></tbody>' +
+    '</table></div>' +
+    '<div class="addb">' +
+      '<button class="badd" onclick="addRow(\'k\')">+ Kosong</button>' +
+      '<button class="badd-penjamin" onclick="openAddPenjaminModal()">+ Penjamin Baru</button>' +
+    '</div>' +
+    '<div class="actb">' +
+      '<button class="bpri" onclick="doExport()">Export Excel</button>' +
+      '<button class="bsec" onclick="clearAll()">Reset</button>' +
+      '<button id="btnSubmit2" onclick="submitToSheets()" style="margin-left:auto;padding:6px 14px;background:#1a4e8a;color:white;border:none;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer">Submit ke Sheets</button>' +
+    '</div>' +
+  '</div>' +
+  '<div class="sdiv"><span>MCU Harian</span></div>' +
+  '<div class="card">' +
+    '<div class="ch"><div class="ct">MCU Harian</div><span class="rc" id="rcM">0 baris</span></div>' +
+    '<div class="tw"><table>' +
+      '<thead><tr>' +
+        '<th>#</th><th class="thl" style="min-width:220px">Perusahaan</th>' +
+        '<th>Peserta</th><th style="text-align:right">Nominal</th>' +
+        '<th style="text-align:right">Total</th>' +
+        '<th class="thl">Ket. Paket</th>' +
+        '<th>Link</th><th></th>' +
+      '</tr></thead>' +
+      '<tbody id="bM"></tbody>' +
+    '</table></div>' +
+    '<div class="addb"><button class="badd" onclick="addRow(\'m\')">+ Baris MCU</button></div>' +
+  '</div>';
+}
+
+
+function doExport() {
+  const date = document.getElementById('iDate').value;
+  if (!date) { toast('Pilih tanggal!', 'warn'); return; }
+  const LC = {
+    'PG'             :{bg:'DBEAFE',hdr:'1D4ED8',txt:'1E3A8A'},
+    'BPJS'           :{bg:'DCFCE7',hdr:'166534',txt:'14532D'},
+    'BRI LIFE PG'    :{bg:'FEE2E2',hdr:'991B1B',txt:'7F1D1D'},
+    'PROKESPEN'      :{bg:'EDE9FE',hdr:'5B21B6',txt:'4C1D95'},
+    'PROKESPEN BPJS' :{bg:'D9F99D',hdr:'3A5C00',txt:'365314'},
+    'UMUM'           :{bg:'FEF3C7',hdr:'B45309',txt:'92400E'},
+    'TUNAI'          :{bg:'FEF3C7',hdr:'B45309',txt:'92400E'},
+    'JKK'            :{bg:'FCE7F3',hdr:'9D174D',txt:'831843'},
+    'NPG'            :{bg:'FFEDD5',hdr:'C2410C',txt:'9A3412'},
+    'AS'             :{bg:'E0E7FF',hdr:'4338CA',txt:'3730A3'},
+    ''               :{bg:'F8FAFC',hdr:'475569',txt:'334155'},
+  };
+  const COLS_DEF=[['rj','RJ A.Yani',9],['ri','RI A.Yani',9],['igd','IGD',7],['mcu','MCU',7],['promo','Promo',8],['dokter','Dokter Luar',10],['exc','Poli Exc',8],['prior','Poli Prior',9],['grj','Grahu RJ',9],['gri','Grahu RI',9],['sat','Satelit',8],['ppk','PPK1',7]];
+  const lOrder=['PG','BPJS','BRI LIFE PG','PROKESPEN','PROKESPEN BPJS','UMUM','TUNAI','JKK','NPG','AS',''];
+  const pMap={}, pOrd=[];
+  KR.forEach(r => {
+    if (!r.j) return;
+    if (!pMap[r.j]) { pMap[r.j]={label:r.k||'',data:{}}; pOrd.push(r.j); }
+    KC.forEach(c => { const v=parseInt(r[c])||0; if(v>0) pMap[r.j].data[c]=(pMap[r.j].data[c]||0)+v; });
+  });
+  pOrd.sort((a,b) => { const la=lOrder.indexOf(pMap[a].label), lb=lOrder.indexOf(pMap[b].label); return (la<0?99:la)-(lb<0?99:lb)||a.localeCompare(b); });
+  const aoa = [
+    ['LAPORAN HARIAN KUNJUNGAN LABORATORIUM A. YANI','','','','','','','','','','','','','',''],
+    ['Tanggal :', date,'','','','','','','','','','','','',''],
+    [],
+    ['KET','JAMINAN',...COLS_DEF.map(c=>c[1]),'TOTAL'],
+  ];
+  let prevK='';
+  pOrd.forEach(j => { const r=pMap[j]; const nums=COLS_DEF.map(([k])=>r.data[k]||0); aoa.push([r.label===prevK?'':r.label, j, ...nums, nums.reduce((a,b)=>a+b,0)]); prevK=r.label; });
+  const totR=COLS_DEF.map(([k])=>pOrd.reduce((s,j)=>s+(pMap[j].data[k]||0),0));
+  aoa.push(['TOTAL','',...totR,totR.reduce((a,b)=>a+b,0)]);
+  aoa.push([],[' REKAP PER LABEL','','','','','','','','','','','','','','']);
+  aoa.push(['LABEL',...COLS_DEF.map(c=>c[1]),'TOTAL']);
+  lOrder.forEach(l => { const rows=pOrd.filter(j=>pMap[j].label===l); if(!rows.length)return; const nums=COLS_DEF.map(([k])=>rows.reduce((s,j)=>s+(pMap[j].data[k]||0),0)); aoa.push([l||'LAIN-LAIN',...nums,nums.reduce((a,b)=>a+b,0)]); });
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.aoa_to_sheet(aoa);
+  ws1['!cols'] = [{wch:7},{wch:38},...COLS_DEF.map(c=>({wch:c[2]})),{wch:9}];
+  ws1['!merges'] = [{s:{r:0,c:0},e:{r:0,c:14}}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Laporan Harian');
+  const mAoa = [['MCU HARIAN - '+date,'','','','','',''],['No.','Perusahaan','Label','Paket','Peserta','Nominal/Orang','Total']];
+  let mp=0, mt=0;
+  MR.forEach((r,i) => { if(!r.p)return; const n=parseInt(r.n)||0, nm=parseInt(r.nom)||0; const kRow=KR.find(k=>k.j&&k.j.toUpperCase()===r.p.toUpperCase()); mp+=n; mt+=n*nm; mAoa.push([i+1,r.p,kRow?kRow.k||'':'',r.kp||'',n,nm,n*nm]); });
+  if (mp>0) mAoa.push(['TOTAL','','','',mp,'',mt]);
+  const ws2 = XLSX.utils.aoa_to_sheet(mAoa);
+  ws2['!cols'] = [{wch:5},{wch:42},{wch:8},{wch:22},{wch:9},{wch:16},{wch:18}];
+  ws2['!merges'] = [{s:{r:0,c:0},e:{r:0,c:6}}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'MCU Harian');
+  const dbK=[['Tanggal','Label','Kategori','Nama Jaminan','Lokasi','Jumlah']];
+  KR.forEach(r=>{if(!r.j)return;KC.forEach(c=>{const v=parseInt(r[c])||0;if(v>0)dbK.push([date,r.k||'',r.k||'',r.j,LOC_MAP[c],v]);});});
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dbK), 'DB Kunjungan');
+  const dbM=[['Tanggal','Perusahaan','Label','Paket','Peserta','Nominal','Total']];
+  MR.forEach(r=>{if(!r.p)return;const n=parseInt(r.n)||0,nm=parseInt(r.nom)||0;if(n>0){const kRow=KR.find(k=>k.j&&k.j.toUpperCase()===r.p.toUpperCase());dbM.push([date,r.p,kRow?kRow.k||'':'',r.kp||'',n,nm,n*nm]);}});
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dbM), 'DB MCU');
+  XLSX.writeFile(wb, 'Lap_' + date + '.xlsx');
+  toast('Excel berhasil diexport!');
+}
+
+
+window._khLoaded = false;
+
+function openMCULabelPicker(){ document.getElementById('mcuLPOverlay').classList.add('show'); }
+function closeMCULP(){ document.getElementById('mcuLPOverlay').classList.remove('show'); }
+function confirmMCULP(lbl){ closeMCULP(); addRow('m',lbl); }
 </script>
+<!-- Modals -->
+<div class="modal-overlay" id="lpOverlay" onclick="if(event.target===this)closeLP()">
+  <div class="modal" style="width:280px">
+    <div class="modal-title">Pilih Kategori</div>
+    <div class="label-grid">
+      <div class="label-opt" onclick="confirmLP('NPG')">NPG</div>
+      <div class="label-opt" onclick="confirmLP('AS')">AS</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Tambah Penjamin Baru</div>
+    <div class="label-grid" style="margin-bottom:10px">
+      <div class="label-opt" id="lopt-npg" onclick="selectLabel('NPG')">NPG</div>
+      <div class="label-opt" id="lopt-as" onclick="selectLabel('AS')">AS</div>
+    </div>
+    <input type="text" class="fi" id="modalSearch" style="width:100%" placeholder="Nama penjamin..." oninput="onModalSearch()">
+    <div class="modal-btns" style="display:flex;gap:8px;margin-top:12px">
+      <button class="bsec" style="flex:1" onclick="closeModal()">Batal</button>
+      <button class="bpri" style="flex:1" id="mbtnAdd" onclick="confirmAddPenjamin()" disabled>Tambah</button>
+    </div>
+  </div>
+</div>
+
+<div class="acl" id="acl"></div>
+<div class="kh-toast" id="kh-tst"><span id="tstMsg"></span></div>
+<div class="kh-toast" id="kh-tst"><span id="tstMsg"></span></div>
+
+<!-- MCU Label Picker -->
+<div class="modal-overlay" id="mcuLPOverlay" onclick="if(event.target===this)closeMCULP()">
+  <div class="modal" style="width:300px;padding:16px">
+    <div class="modal-title" style="font-size:12px;margin-bottom:10px">Label Perusahaan MCU</div>
+    <div class="label-grid" style="grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px">
+      <div class="label-opt" onclick="confirmMCULP('PG')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#1d4ed8">PG</span></div>
+      <div class="label-opt" onclick="confirmMCULP('BPJS')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#166534">BPJS</span></div>
+      <div class="label-opt" onclick="confirmMCULP('BRI LIFE PG')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#991b1b">BRI LIFE PG</span></div>
+      <div class="label-opt" onclick="confirmMCULP('PROKESPEN')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#5b21b6">PROKESPEN</span></div>
+      <div class="label-opt" onclick="confirmMCULP('PROKESPEN BPJS')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#3a5c00">PROKESPEN BPJS</span></div>
+      <div class="label-opt" onclick="confirmMCULP('NPG')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#c2410c">NPG</span></div>
+      <div class="label-opt" onclick="confirmMCULP('AS')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#4338ca">AS</span></div>
+      <div class="label-opt" onclick="confirmMCULP('JKK')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#9d174d">JKK</span></div>
+      <div class="label-opt" onclick="confirmMCULP('UMUM')" style="font-size:10px;padding:7px 4px"><span style="font-weight:700;color:#b45309">UMUM</span></div>
+    </div>
+    <button class="bsec" style="width:100%;font-size:10px;padding:5px" onclick="closeMCULP()">Batal</button>
+  </div>
+</div>
 </body>
 </html>
