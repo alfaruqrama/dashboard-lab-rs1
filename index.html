@@ -2212,8 +2212,7 @@ function loadSess(){try{const k=sessionStorage.getItem('k'),m=sessionStorage.get
 function toast(msg,type='ok'){const t=document.getElementById('kh-tst');const tm=document.getElementById('tstMsg');if(!t||!tm)return;tm.textContent=msg;t.className='kh-toast show '+type;setTimeout(()=>{if(t)t.className='kh-toast';},3000);}
 
 // ── KUNJUNGAN HARIAN ─────────────────────────────────────────────────────────
-// GAS_URL_KH = sama dengan GS_URL dashboard (1 GAS untuk semua)
-// Jika GAS kunjungan terpisah, ganti nilainya
+const GAS_URL_KH = 'https://script.google.com/macros/s/AKfycbwm-9DPBcwn6Zyyh57m-mzUaKiq7GnU0Mc-1__I9shNzN57IOR7fuDVeDhh5v335bu67w/exec';
 // PL/PS initialized after FALLBACK_PL (see below)
 
 async function loadPenjamin() {
