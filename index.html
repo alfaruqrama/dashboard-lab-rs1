@@ -568,6 +568,7 @@ tbody td.tdn{font-family:var(--mono);font-size:9px;color:var(--muted);width:26px
 .tcur::-webkit-outer-spin-button, .tcur::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 .tnum{width:44px;padding:2px 3px;font-size:10.5px;border-radius:4px;background:transparent;border:1px solid transparent;text-align:center;font-family:var(--mono);outline:none}
+.tnum:invalid,.tcur:invalid{border-color:var(--danger);background:var(--dl)}
 .tnum:focus{border-color:var(--acc);background:var(--acl)}
 .tcur{width:75px;padding:2px 3px;font-size:10.5px;text-align:right;font-family:var(--mono);border:1px solid transparent;background:transparent;outline:none}
 .tcur:focus{border-color:var(--acc);background:var(--acl)}
@@ -1898,6 +1899,33 @@ function syncMCU(){
   });
 }
 
+
+// ── Numeric-only input enforcement ───────────────────────────────────────────
+function setupNumInput(inp) {
+  inp.setAttribute('inputmode', 'numeric');
+  inp.setAttribute('min', '0');
+  inp.setAttribute('step', '1');
+  inp.onkeydown = function(e) {
+    // Allow: backspace, delete, tab, escape, enter, arrows, home, end
+    const allowed = ['Backspace','Delete','Tab','Escape','Enter',
+                     'ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'];
+    if (allowed.includes(e.key)) return;
+    // Allow Ctrl/Cmd+A, C, V, X
+    if ((e.ctrlKey || e.metaKey) && ['a','c','v','x'].includes(e.key.toLowerCase())) return;
+    // Block anything that's not a digit
+    if (!/^[0-9]$/.test(e.key)) { e.preventDefault(); return; }
+    // Block leading zeros (except clearing to 0)
+    if (e.key === '0' && inp.value === '0') { e.preventDefault(); return; }
+  };
+  inp.onpaste = function(e) {
+    const txt = (e.clipboardData || window.clipboardData).getData('text');
+    if (!/^[0-9]+$/.test(txt.trim())) {
+      e.preventDefault();
+      toast('Hanya angka yang diperbolehkan!', 'warn');
+    }
+  };
+}
+
 function rK(){
   const tb=document.getElementById('bK'); if(!tb)return; tb.innerHTML='';
   KR.forEach((row,i)=>{
@@ -1927,7 +1955,7 @@ function rK(){
         tdc.className='mcu-col'; const val=parseInt(row.mcu)||0;
         tdc.innerHTML=val?`<span class="mcu-val">${val}</span><br><span class="mcu-auto">auto</span>`:'—';
       } else {
-        const inp=document.createElement('input'); inp.type='number'; inp.className='tnum'; inp.value=row[col]||''; inp.placeholder='—';
+        const inp=document.createElement('input'); inp.type='number'; inp.className='tnum'; inp.value=row[col]||''; inp.placeholder='—'; setupNumInput(inp);
         if(!row.j){inp.disabled=true;inp.title='Isi nama penjamin dulu';inp.style.opacity='.3';inp.style.cursor='not-allowed';}
         inp.oninput=e=>{
           if(!row.j){e.target.value='';toast('Isi nama penjamin terlebih dahulu!','warn');return;}
@@ -1936,7 +1964,7 @@ function rK(){
           row[col]=e.target.value===''?'':(val || 0); 
           const _kt=document.getElementById('kt'+row.id);if(_kt)_kt.textContent=krt(row)||'—'; updateStats(); sv();
         };
-        inp.onkeydown=handleKey;
+        // onkeydown handled by setupNumInput (numeric only)
         tdc.appendChild(inp);
       }
       tr.appendChild(tdc);
@@ -1991,7 +2019,7 @@ function rM(){
 
     // ── Peserta ──────────────────────────────────────────────────────────────
     const tp=document.createElement('td');
-    const ip=document.createElement('input'); ip.type='number'; ip.className='tnum'; ip.value=row.n||''; ip.placeholder='—';
+    const ip=document.createElement('input'); ip.type='number'; ip.className='tnum'; ip.value=row.n||''; ip.placeholder='—'; setupNumInput(ip);
     if(!row.p){ip.disabled=true;ip.title='Isi nama perusahaan dulu';ip.style.opacity='.3';}
     ip.oninput=e=>{
       if(!row.p){e.target.value='';toast('Isi nama perusahaan terlebih dahulu!','warn');return;}
@@ -2005,7 +2033,7 @@ function rM(){
 
     // ── Nominal ──────────────────────────────────────────────────────────────
     const tn=document.createElement('td');
-    const inm=document.createElement('input'); inm.type='number'; inm.className='tcur'; inm.value=row.nom||''; inm.placeholder='0';
+    const inm=document.createElement('input'); inm.type='number'; inm.className='tcur'; inm.value=row.nom||''; inm.placeholder='0'; setupNumInput(inm);
     if(!row.p){inm.disabled=true;inm.title='Isi nama perusahaan dulu';inm.style.opacity='.3';}
     inm.oninput=e=>{
       if(!row.p){e.target.value='';toast('Isi nama perusahaan terlebih dahulu!','warn');return;}
