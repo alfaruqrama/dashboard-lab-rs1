@@ -1515,7 +1515,25 @@ function setTab(t) {
     const ms = sortBulan(Object.keys(S.data.mcu || {}));
     if (!ms.includes(S.mcuMonth)) S.mcuMonth = ms[ms.length-1];
   }
-  if (t !== 'kunjHarian') window._khLoaded = false; // reset agar autocomplete fresh
+  if (t !== 'kunjHarian') window._khLoaded = false;
+
+// ── Notif saat refresh/close jika ada data yang belum disubmit ────────────────
+function hasUnsavedData() {
+  if (window.S && window.S.tab !== 'kunjHarian') return false;
+  const hasK = KR.some(r => r.j && Object.values(
+    Object.fromEntries(KC.map(c => [c, parseInt(r[c])||0]))
+  ).some(v => v > 0));
+  const hasM = MR.some(r => r.p && (parseInt(r.n)||0) > 0);
+  return hasK || hasM;
+}
+
+window.addEventListener('beforeunload', function(e) {
+  if (hasUnsavedData()) {
+    e.preventDefault();
+    e.returnValue = 'Data kunjungan harian belum disubmit. Yakin mau meninggalkan halaman?';
+    return e.returnValue;
+  }
+}); // reset agar autocomplete fresh
   render();
 }
 function setMcuMonth(m) { S.tab = 'mcu'; S.mcuMonth = m; render(); }
@@ -2173,7 +2191,7 @@ function toast(msg,type='ok'){const t=document.getElementById('kh-tst');const tm
 async function loadPenjamin() {
   const ind = document.getElementById('ldInd');
   try {
-    const url = GS_URL.trim();
+    const url = (typeof GAS_URL_KH !== 'undefined' ? GAS_URL_KH : GS_URL).trim();
     if (!url) throw new Error('no url');
     const r = await fetch(url + '?action=penjamin');
     const json = await r.json();
@@ -2190,8 +2208,8 @@ async function loadPenjamin() {
 }
 
 async function submitToSheets() {
-  const url = GS_URL.trim();
-  if (!url || url.includes('GANTI')) { toast('GAS_URL belum diisi!', 'warn'); return; }
+  const url = (typeof GAS_URL_KH !== 'undefined' ? GAS_URL_KH : GS_URL).trim();
+  if (!url) { toast('GAS_URL_KH belum diisi!', 'warn'); return; }
   const date = document.getElementById('iDate').value;
   if (!date) { toast('Pilih tanggal dulu!', 'warn'); return; }
   const kunjungan = [];
@@ -2211,6 +2229,10 @@ async function submitToSheets() {
       body: JSON.stringify({ action:'submit', tanggal:date, kunjungan, mcu, penjaminBaru }),
       mode: 'no-cors' });
     KR.forEach(r => r.isNew = false);
+    // Reset data setelah submit sukses agar notif refresh tidak muncul
+    KR.forEach(r => KC.forEach(c => r[c] = ''));
+    MR.forEach(r => { r.n = ''; r.nom = ''; });
+    rK(); rM(); updateStats();
     toast('✓ Data terkirim ke Sheets!');
   } catch(err) { toast('Gagal: ' + err.message, 'warn'); }
   finally { btn.disabled = false; btn.textContent = 'Submit ke Sheets'; }
@@ -2361,6 +2383,24 @@ function doExport() {
 
 
 window._khLoaded = false;
+
+// ── Notif saat refresh/close jika ada data yang belum disubmit ────────────────
+function hasUnsavedData() {
+  if (window.S && window.S.tab !== 'kunjHarian') return false;
+  const hasK = KR.some(r => r.j && Object.values(
+    Object.fromEntries(KC.map(c => [c, parseInt(r[c])||0]))
+  ).some(v => v > 0));
+  const hasM = MR.some(r => r.p && (parseInt(r.n)||0) > 0);
+  return hasK || hasM;
+}
+
+window.addEventListener('beforeunload', function(e) {
+  if (hasUnsavedData()) {
+    e.preventDefault();
+    e.returnValue = 'Data kunjungan harian belum disubmit. Yakin mau meninggalkan halaman?';
+    return e.returnValue;
+  }
+});
 
 function openMCULabelPicker(){ document.getElementById('mcuLPOverlay').classList.add('show'); }
 function closeMCULP(){ document.getElementById('mcuLPOverlay').classList.remove('show'); }
